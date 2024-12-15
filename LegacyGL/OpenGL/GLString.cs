@@ -9,14 +9,14 @@ namespace LegacyGL.OpenGL
     public unsafe class GLString : IDisposable
     {
         private bool noDispose;
-        private IntPtr data;
+        private nint data;
         public int Length { get; private set; }
         public string Data => Marshal.PtrToStringAnsi(data);
         public char* RawData => (char*)data;
 
         public GLString(char* data)
         {
-            this.data = (IntPtr)data;
+            this.data = (nint)data;
             int idx = 0;
             while (data[idx++] != 0x00)
                 ;

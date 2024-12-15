@@ -13,7 +13,7 @@ namespace LegacyGL.Internal.Win32Impl
     internal class W32LGL : ILGL
     {
         private const string GL_LIBRARY = "OpenGL32.dll";
-        private IntPtr glLib;
+        private nint glLib;
         private W32GLLookup glLookup;
         private GLAPILoader apiLoader;
         internal W32Viewport viewport;
@@ -39,7 +39,7 @@ namespace LegacyGL.Internal.Win32Impl
             {
                 if (!OpenClipboard(NULLPTR))
                     return "";
-                IntPtr handle = GetClipboardData(CF_TEXT);
+                nint handle = GetClipboardData(CF_TEXT);
                 string data = Marshal.PtrToStringAnsi(handle);
                 CloseClipboard();
                 return data ?? "";
@@ -48,7 +48,7 @@ namespace LegacyGL.Internal.Win32Impl
             {
                 if (!OpenClipboard(NULLPTR))
                     return;
-                IntPtr handle = Marshal.StringToHGlobalAnsi(value);
+                nint handle = Marshal.StringToHGlobalAnsi(value);
                 SetClipboardData(CF_TEXT, handle);
                 Marshal.FreeHGlobal(handle);
                 CloseClipboard();

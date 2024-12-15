@@ -33,63 +33,63 @@ namespace LegacyGL.OpenAL
         public const int ALC_CAPTURE_SAMPLES = 0x312;
 
         [DllImport("openal32.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr alcCreateContext(IntPtr device, int* attrlist);
+        public static extern nint alcCreateContext(nint device, int* attrlist);
 
         [DllImport("openal32.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool alcMakeContextCurrent(IntPtr context);
+        public static extern bool alcMakeContextCurrent(nint context);
 
         [DllImport("openal32.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void alcProcessContext(IntPtr context);
+        public static extern void alcProcessContext(nint context);
 
         [DllImport("openal32.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void alcSuspendContext(IntPtr context);
+        public static extern void alcSuspendContext(nint context);
 
         [DllImport("openal32.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void alcDestroyContext(IntPtr context);
+        public static extern void alcDestroyContext(nint context);
 
         [DllImport("openal32.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr alcGetCurrentContext();
+        public static extern nint alcGetCurrentContext();
 
         [DllImport("openal32.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr alcGetContextsDevice(IntPtr context);
+        public static extern nint alcGetContextsDevice(nint context);
 
         [DllImport("openal32.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr alcOpenDevice(string devicename);
+        public static extern nint alcOpenDevice(string devicename);
 
         [DllImport("openal32.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool alcCloseDevice(IntPtr device);
+        public static extern bool alcCloseDevice(nint device);
 
         [DllImport("openal32.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern int alcGetError(IntPtr device);
+        public static extern int alcGetError(nint device);
 
         [DllImport("openal32.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool alcIsExtensionPresent(IntPtr device, string extname);
+        public static extern bool alcIsExtensionPresent(nint device, string extname);
 
         [DllImport("openal32.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void* alcGetProcAddress(IntPtr device, string funcname);
+        public static extern void* alcGetProcAddress(nint device, string funcname);
 
         [DllImport("openal32.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern int alcGetEnumValue(IntPtr device, string enumname);
+        public static extern int alcGetEnumValue(nint device, string enumname);
 
         [DllImport("openal32.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern string alcGetString(IntPtr device, int param);
+        public static extern string alcGetString(nint device, int param);
 
         [DllImport("openal32.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void alcGetIntegerv(IntPtr device, int param, int size, int* data);
+        public static extern void alcGetIntegerv(nint device, int param, int size, int* data);
 
         [DllImport("openal32.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr alcCaptureOpenDevice(string devicename, uint frequency, int format, int buffersize);
+        public static extern nint alcCaptureOpenDevice(string devicename, uint frequency, int format, int buffersize);
 
         [DllImport("openal32.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool alcCaptureCloseDevice(IntPtr device);
+        public static extern bool alcCaptureCloseDevice(nint device);
 
         [DllImport("openal32.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void alcCaptureStart(IntPtr device);
+        public static extern void alcCaptureStart(nint device);
 
         [DllImport("openal32.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void alcCaptureStop(IntPtr device);
+        public static extern void alcCaptureStop(nint device);
 
         [DllImport("openal32.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void alcCaptureSamples(IntPtr device, void* buffer, int samples);
+        public static extern void alcCaptureSamples(nint device, void* buffer, int samples);
     }
 }

@@ -9,18 +9,18 @@ namespace LegacyGL.Internal.Win32Impl.Native
     internal static class W32WGL
     {
         [DllImport("opengl32.dll", SetLastError = true)]
-        public static extern IntPtr wglCreateContext(IntPtr hdc);
+        public static extern nint wglCreateContext(nint hdc);
 
         [DllImport("opengl32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool wglMakeCurrent(IntPtr hdc, IntPtr hglrc);
+        public static extern bool wglMakeCurrent(nint hdc, nint hglrc);
 
         [DllImport("opengl32.dll")]
-        public static extern IntPtr wglGetProcAddress(
+        public static extern nint wglGetProcAddress(
             [In()][MarshalAs(UnmanagedType.LPStr)] string ext);
 
         [DllImport("opengl32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool wglDeleteContext(IntPtr hglrc);
+        public static extern bool wglDeleteContext(nint hglrc);
     }
 }

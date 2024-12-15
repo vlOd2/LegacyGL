@@ -9,17 +9,17 @@ namespace LegacyGL.Internal.Win32Impl.Native
     internal static class W32Libraries
     {
         [DllImport("kernel32.dll")]
-        public static extern IntPtr LoadLibraryA(
+        public static extern nint LoadLibraryA(
             [In()][MarshalAs(UnmanagedType.LPStr)] string lpLibFileName);
 
         [DllImport("kernel32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool FreeLibrary(IntPtr hLibModule);
+        public static extern bool FreeLibrary(nint hLibModule);
 
         [DllImport("kernel32.dll")]
-        public static extern IntPtr GetModuleHandle(string lpModuleName);
+        public static extern nint GetModuleHandle(string lpModuleName);
 
         [DllImport("kernel32.dll")]
-        public static extern IntPtr GetProcAddress(IntPtr hModule, string lpProcName);
+        public static extern nint GetProcAddress(nint hModule, string lpProcName);
     }
 }

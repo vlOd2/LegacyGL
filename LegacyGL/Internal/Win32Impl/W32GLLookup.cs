@@ -9,9 +9,9 @@ namespace LegacyGL.Internal.Win32Impl
 {
     internal class W32GLLookup : IGLLookup
     {
-        private IntPtr glLib;
+        private nint glLib;
 
-        public W32GLLookup(IntPtr glLib)
+        public W32GLLookup(nint glLib)
         {
             this.glLib = glLib;
         }
@@ -20,11 +20,11 @@ namespace LegacyGL.Internal.Win32Impl
         {
             string name = entryPoint;
 
-            IntPtr funcPtr = W32WGL.wglGetProcAddress(name);
-            if (funcPtr == IntPtr.Zero)
+            nint funcPtr = W32WGL.wglGetProcAddress(name);
+            if (funcPtr == nint.Zero)
             {
                 funcPtr = W32Libraries.GetProcAddress(glLib, name);
-                if (funcPtr == IntPtr.Zero)
+                if (funcPtr == nint.Zero)
                 {
                     if (optional)
                     {

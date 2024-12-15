@@ -29,13 +29,13 @@ namespace LegacyGL.Internal
         //    if (osVer.Major < 5 || (osVer.Major == 5 && osVer.Minor < 1))
         //        return false;
 
-        //    IntPtr u32Lib = W32Libraries.GetModuleHandle("user32.dll");
+        //    nint u32Lib = W32Libraries.GetModuleHandle("user32.dll");
         //    if (u32Lib == NULLPTR)
         //        return false;
 
-        //    IntPtr getRawInputData = W32Libraries.GetProcAddress(u32Lib, "GetRawInputData");
-        //    IntPtr registerRawInputDevices = W32Libraries.GetProcAddress(u32Lib, "RegisterRawInputDevices");
-        //    IntPtr getRawInputDeviceList = W32Libraries.GetProcAddress(u32Lib, "GetRawInputDeviceList");
+        //    nint getRawInputData = W32Libraries.GetProcAddress(u32Lib, "GetRawInputData");
+        //    nint registerRawInputDevices = W32Libraries.GetProcAddress(u32Lib, "RegisterRawInputDevices");
+        //    nint getRawInputDeviceList = W32Libraries.GetProcAddress(u32Lib, "GetRawInputDeviceList");
         //    return getRawInputData != NULLPTR &&
         //        registerRawInputDevices != NULLPTR &&
         //        getRawInputDeviceList != NULLPTR;

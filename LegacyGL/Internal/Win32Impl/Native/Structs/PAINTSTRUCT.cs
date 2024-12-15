@@ -9,7 +9,7 @@ namespace LegacyGL.Internal.Win32Impl.Native.Structs
     [StructLayout(LayoutKind.Sequential)]
     internal struct PAINTSTRUCT
     {
-        public IntPtr hdc;
+        public nint hdc;
         [MarshalAs(UnmanagedType.Bool)]
         public bool fErase;
         public RECT rcPaint;

@@ -36,7 +36,7 @@ namespace LegacyGL
         public const int MB_OK = 0;
 
         [DllImport("user32.dll", EntryPoint = "MessageBoxA")]
-        public static extern int W32_MessageBoxA(IntPtr hWnd,
+        public static extern int W32_MessageBoxA(nint hWnd,
             [In()][MarshalAs(UnmanagedType.LPStr)] string lpText,
             [In()][MarshalAs(UnmanagedType.LPStr)] string lpCaption,
             uint uType);
@@ -80,7 +80,7 @@ namespace LegacyGL
                     break;
             }
 
-            W32_MessageBoxA(IntPtr.Zero, body, title, type);
+            W32_MessageBoxA(nint.Zero, body, title, type);
         }
     }
 }

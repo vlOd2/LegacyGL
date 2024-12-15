@@ -12,13 +12,13 @@ namespace LegacyGL.Internal.Win32Impl.Native
 
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool OpenClipboard(IntPtr hWndNewOwner);
+        public static extern bool OpenClipboard(nint hWndNewOwner);
 
         [DllImport("user32.dll")]
-        public static extern IntPtr GetClipboardData(uint uFormat);
+        public static extern nint GetClipboardData(uint uFormat);
 
         [DllImport("user32.dll")]
-        public static extern IntPtr SetClipboardData(int uFormat, IntPtr hMem);
+        public static extern nint SetClipboardData(int uFormat, nint hMem);
 
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]

@@ -42,10 +42,10 @@ namespace LegacyGL.Internal.Win32Impl
         private const int WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB = 0x00000002;
         #endregion
         private WNDCLASS wndClass;
-        public IntPtr Handle;
+        public nint Handle;
         private nint icon;
-        private IntPtr deviceContext;
-        private IntPtr glContext;
+        private nint deviceContext;
+        private nint glContext;
         public readonly SynchronizedQueue<W32KBEvent> KeyboardEvents = new SynchronizedQueue<W32KBEvent>();
         public bool CursorHidden;
         public float ScrollWheel;
@@ -158,7 +158,7 @@ namespace LegacyGL.Internal.Win32Impl
 
         public W32Viewport()
         {
-            IntPtr module = Marshal.GetHINSTANCE(typeof(W32Viewport).Module);
+            nint module = Marshal.GetHINSTANCE(typeof(W32Viewport).Module);
             wndClass = new WNDCLASS()
             {
                 style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC,
@@ -198,7 +198,7 @@ namespace LegacyGL.Internal.Win32Impl
             return pixelFormat;
         }
 
-        public static void DumpPixelFormat(IntPtr deviceContext, int format)
+        public static void DumpPixelFormat(nint deviceContext, int format)
         {
             PIXELFORMATDESCRIPTOR pixelFormat = new PIXELFORMATDESCRIPTOR();
             DescribePixelFormat(deviceContext, format,
@@ -213,11 +213,11 @@ namespace LegacyGL.Internal.Win32Impl
             Console.WriteLine($"----------------------------------");
         }
 
-        private delegate IntPtr wglCreateContextAttribsARB(IntPtr hdc, IntPtr hshareContext, int[] attribList);
+        private delegate nint wglCreateContextAttribsARB(nint hdc, nint hshareContext, int[] attribList);
 
-        private IntPtr CreateGLContext()
+        private nint CreateGLContext()
         {
-            IntPtr context = wglCreateContext(deviceContext);
+            nint context = wglCreateContext(deviceContext);
 
             if (context == NULLPTR)
                 Utils.GLInitFailed("wglCreateContext");
@@ -241,7 +241,7 @@ namespace LegacyGL.Internal.Win32Impl
             if (!SetPixelFormat(deviceContext, format, ref pixelFormat))
                 Utils.GLInitFailed("SetPixelFormat");
 
-            IntPtr tempContext = CreateGLContext();
+            nint tempContext = CreateGLContext();
             wglCreateContextAttribsARB createContextARB = lookup.Lookup<wglCreateContextAttribsARB>(true);
             wglDeleteContext(tempContext);
 
@@ -300,7 +300,7 @@ namespace LegacyGL.Internal.Win32Impl
                 Repeat = repeat
             });
 
-        private IntPtr WndProc(IntPtr hWnd, uint uMsg, IntPtr wParam, IntPtr lParam)
+        private nint WndProc(nint hWnd, uint uMsg, nint wParam, nint lParam)
         {
             switch (uMsg)
             {

@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 namespace LegacyGL.Internal.Win32Impl.Native
 {
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    internal delegate IntPtr WNDPROC(IntPtr hWnd, uint uMsg, IntPtr wParam, IntPtr lParam);
+    internal delegate nint WNDPROC(nint hWnd, uint uMsg, nint wParam, nint lParam);
 
     [StructLayout(LayoutKind.Sequential)]
     internal struct WNDCLASS
@@ -16,10 +16,10 @@ namespace LegacyGL.Internal.Win32Impl.Native
         public WNDPROC lpfnWndProc;
         public int cbClsExtra;
         public int cbWndExtra;
-        public IntPtr hInstance;
-        public IntPtr hIcon;
-        public IntPtr hCursor;
-        public IntPtr hbrBackground;
+        public nint hInstance;
+        public nint hIcon;
+        public nint hCursor;
+        public nint hbrBackground;
         [MarshalAs(UnmanagedType.LPStr)]
         public string lpszMenuName;
         [MarshalAs(UnmanagedType.LPStr)]
