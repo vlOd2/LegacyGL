@@ -1,5 +1,5 @@
-# ZeroCraft
-A Minecraft Classic clone in C# .NETFX 4.0
+# LegacyGL
+Low level OpenGL framework
 
 # ⚖ License
 This project is licensed under the AGPLv3 license
