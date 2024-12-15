@@ -30,7 +30,7 @@ namespace LegacyGL.Internal.Win32Impl
             set => viewport.ClientSize = new Size(VWidth, value);
         }
         public string VTitle { get => viewport.Title; set => viewport.Title = value; }
-        public Icon VIcon { get => viewport.Icon; set => viewport.Icon = value; }
+        public nint VIcon { get => viewport.Icon; set => viewport.Icon = value; }
         public bool VResizable { get => viewport.Resizable; set => viewport.Resizable = value; }
         public bool ShouldClose => viewport.ShouldClose;
         public string ClipboardContent

@@ -11,7 +11,7 @@ namespace LegacyGL.Internal
         int VWidth { get; set; }
         int VHeight { get; set; }
         string VTitle { get; set; }
-        Icon VIcon { get; set; }
+        nint VIcon { get; set; }
         bool VResizable { get; set; }
         bool ShouldClose { get; }
         string ClipboardContent { get; set; }

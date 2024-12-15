@@ -10,7 +10,7 @@ namespace LegacyGL.Internal.X11Impl
         public int VWidth { get; set; }
         public int VHeight { get; set; }
         public string VTitle { get; set; }
-        public Icon VIcon { get; set; }
+        public nint VIcon { get; set; }
         public bool VResizable { get; set; }
         public bool ShouldClose { get; }
         public string ClipboardContent { get; set; }

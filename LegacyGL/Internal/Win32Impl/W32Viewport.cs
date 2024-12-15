@@ -43,7 +43,7 @@ namespace LegacyGL.Internal.Win32Impl
         #endregion
         private WNDCLASS wndClass;
         public IntPtr Handle;
-        private Icon icon;
+        private nint icon;
         private IntPtr deviceContext;
         private IntPtr glContext;
         public readonly SynchronizedQueue<W32KBEvent> KeyboardEvents = new SynchronizedQueue<W32KBEvent>();
@@ -116,10 +116,10 @@ namespace LegacyGL.Internal.Win32Impl
             }
             set => SetWindowTextA(Handle, value);
         }
-        public Icon Icon
+        public nint Icon
         {
             get => icon;
-            set => SetClassLongA(Handle, GCLP_HICON, (int)(icon = value).Handle);
+            set => icon = SetClassLongA(Handle, GCLP_HICON, (int)value);
         }
         public bool ShouldClose { get; private set; }
         public bool Focused { get; private set; }

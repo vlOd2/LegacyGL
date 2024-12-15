@@ -41,7 +41,7 @@ namespace LegacyGL
         /// <summary>
         /// The icon of the viewport
         /// </summary>
-        public static Icon VIcon
+        public static nint VIcon
         {
             get => GetPropSafe(instance.VIcon);
             set => EnsureLoaded(() => instance.VIcon = value);
