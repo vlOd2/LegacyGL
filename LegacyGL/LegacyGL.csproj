@@ -5,4 +5,7 @@
     <Nullable>disable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\XLibSharp\XLibSharp\XLibSharp.csproj" />
+  </ItemGroup>
 </Project>
