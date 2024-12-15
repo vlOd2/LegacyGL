@@ -1,3 +1,6 @@
+// Copyright (c) vlOd
+// Licensed under the GNU Affero General Public License, version 3.0
+
 using System.Drawing;
 using LegacyGL;
 using LegacyGL.Internal;

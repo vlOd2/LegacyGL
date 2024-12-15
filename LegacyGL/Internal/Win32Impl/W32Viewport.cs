@@ -169,7 +169,7 @@ namespace LegacyGL.Internal.Win32Impl
             };
 
             if (RegisterClassA(ref wndClass) == 0)
-                Utils.GLInitFailed("RegisterClassA");
+                throw new GLException("RegisterClassA");
 
             Handle = CreateWindowExA(0, CLASS_NAME, "Game",
                 WS_OVERLAPPEDWINDOW & ~WS_THICKFRAME & ~WS_MAXIMIZEBOX,
@@ -177,7 +177,7 @@ namespace LegacyGL.Internal.Win32Impl
                 NULLPTR, NULLPTR, module, NULLPTR);
 
             if (Handle == NULLPTR)
-                Utils.GLInitFailed("CreateWindowExA");
+                throw new GLException("CreateWindowExA");
 
             ShowWindow(Handle, SW_NORMAL);
             UpdateWindow(Handle);
@@ -220,10 +220,10 @@ namespace LegacyGL.Internal.Win32Impl
             nint context = wglCreateContext(deviceContext);
 
             if (context == NULLPTR)
-                Utils.GLInitFailed("wglCreateContext");
+                throw new GLException("wglCreateContext");
 
             if (!wglMakeCurrent(deviceContext, context))
-                Utils.GLInitFailed("wglMakeCurrent");
+                throw new GLException("wglMakeCurrent");
 
             return context;
         }
@@ -235,11 +235,11 @@ namespace LegacyGL.Internal.Win32Impl
 
             int format = ChoosePixelFormat(deviceContext, ref pixelFormat);
             if (format == 0)
-                Utils.GLInitFailed("ChoosePixelFormat");
+                throw new GLException("ChoosePixelFormat");
 
             DumpPixelFormat(deviceContext, format);
             if (!SetPixelFormat(deviceContext, format, ref pixelFormat))
-                Utils.GLInitFailed("SetPixelFormat");
+                throw new GLException("SetPixelFormat");
 
             nint tempContext = CreateGLContext();
             wglCreateContextAttribsARB createContextARB = lookup.Lookup<wglCreateContextAttribsARB>(true);
@@ -259,10 +259,10 @@ namespace LegacyGL.Internal.Win32Impl
                 0x00 // End of attributes
             });
             if (glContext == NULLPTR)
-                Utils.GLInitFailed("wglCreateContextAttribsARB");
+                throw new GLException("wglCreateContextAttribsARB");
 
             if (!wglMakeCurrent(deviceContext, glContext))
-                Utils.GLInitFailed("wglMakeCurrent");
+                throw new GLException("wglMakeCurrent");
         }
         #endregion
 

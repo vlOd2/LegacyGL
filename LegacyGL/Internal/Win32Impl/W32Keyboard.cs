@@ -8,7 +8,6 @@ namespace LegacyGL.Internal.Win32Impl
 {
     internal class W32Keyboard : IKeyboard
     {
-        private const int REPEAT_INTERVAL = 125; // value, ... fresh from my ass
         private W32Viewport viewport;
         private bool[] keyStates = new bool[256];
         private Queue<InputEvent> events = new Queue<InputEvent>();

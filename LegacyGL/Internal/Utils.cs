@@ -8,20 +8,7 @@ namespace LegacyGL.Internal
 {
     internal static class Utils
     {
-        private static DateTime TimeEpoch = new DateTime(1970, 1, 1);
-
-        public static void GLInitFailed(string function)
-        {
-            int error = Marshal.GetLastWin32Error();
-            Console.Error.WriteLine($"ERROR @ {function}: {error}");
-            MsgBox.Show(
-                $"Failed to initialize OpenGL{Environment.NewLine}" +
-                $"Failed function: {function}{Environment.NewLine}" +
-                $"Error: {error}",
-                "OpenGL Error", MsgBoxBtn.OK, MsgBoxIcon.Error
-            );
-            throw new GLException($"OpenGL initialization failed");
-        }
+        private static readonly DateTime TIME_EPOCH = new DateTime(1970, 1, 1);
 
         //public static bool IsRawInputAvailable()
         //{
@@ -41,6 +28,6 @@ namespace LegacyGL.Internal
         //        getRawInputDeviceList != NULLPTR;
         //}
 
-        public static long UnixMillis => (long)(DateTime.UtcNow - TimeEpoch).TotalMilliseconds;
+        public static long UnixMillis => (long)(DateTime.UtcNow - TIME_EPOCH).TotalMilliseconds;
     }
 }
