@@ -69,7 +69,9 @@ namespace LegacyGL
             if (instance != null)
                 throw new GLException("Context already loaded");
 
-            if (Thread.CurrentThread.GetApartmentState() != ApartmentState.STA)
+            if (Thread.CurrentThread.GetApartmentState() == ApartmentState.Unknown)
+                Console.WriteLine("Unknown thread apartment state! The game might freeze!");
+            else if (Thread.CurrentThread.GetApartmentState() != ApartmentState.STA)
                 throw new ThreadStateException("Apartment state must be STA");
 
             ILGL impl = new X11LGL();

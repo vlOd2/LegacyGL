@@ -4,7 +4,7 @@
 using System.Runtime.InteropServices;
 using XLibSharp;
 
-namespace LegacyGL.Internal.Win32Impl
+namespace LegacyGL.Internal.X11Impl
 {
     internal class X11GLLookup : IGLLookup
     {

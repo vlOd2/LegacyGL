@@ -49,7 +49,6 @@ namespace LegacyGL.Internal.Win32Impl
         public readonly SynchronizedQueue<W32KBEvent> KeyboardEvents = new SynchronizedQueue<W32KBEvent>();
         public bool CursorHidden;
         public float ScrollWheel;
-
         #region Properties
         public bool HasGLContext => glContext != NULLPTR;
         public Point Position

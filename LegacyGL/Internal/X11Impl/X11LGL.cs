@@ -2,25 +2,48 @@
 // Licensed under the GNU Affero General Public License, version 3.0
 
 using System.Drawing;
+using XLibSharp;
 using ZeroCraft.LegacyGL.Internal.X11Impl;
 
 namespace LegacyGL.Internal.X11Impl
 {
     internal class X11LGL : ILGL
     {
-        private const string GL_LIBRARY = "libGL.so.1";
-
-        public int VWidth { get; set; }
-        public int VHeight { get; set; }
+        internal X11Viewport viewport;
+        private X11GLLookup glLookup;
+        private GLAPILoader apiLoader;
+        #region Properties
+        public int VWidth
+        {
+            get => viewport.Size.Width;
+            set => viewport.Size = new Size(value, VHeight);
+        }
+        public int VHeight
+        {
+            get => viewport.Size.Height;
+            set => viewport.Size = new Size(VWidth, value);
+        }
         public string VTitle { get; set; }
         public nint VIcon { get; set; }
         public bool VResizable { get; set; }
-        public bool ShouldClose { get; }
+        public bool ShouldClose => viewport.ShouldClose;
         public string ClipboardContent { get; set; }
-
+        #endregion
+        
         public void Init() 
         {
-            
+            try
+            {
+                glLookup = new X11GLLookup();
+                apiLoader = new GLAPILoader(glLookup);
+                viewport = new X11Viewport();
+                apiLoader.Load();
+            }
+            catch (Exception e)
+            {
+                Dispose();
+                throw;
+            }
         }
 
         public IKeyboard GetKeyboard() 
@@ -35,23 +58,18 @@ namespace LegacyGL.Internal.X11Impl
             return mouse;
         }
 
-        public void Center() 
-        {
-            
-        }
+        public void Center() => viewport.Center();
 
-        public void Flush() 
-        {
+        public void Flush() => viewport.Swap();
 
-        }
-
-        public void Poll() 
-        {
-
-        }
+        public void Poll() => viewport.Poll();
 
         public void Dispose()
         {
+            apiLoader?.Unload();
+            viewport?.Dispose();
+            glLookup = null;
+            viewport = null;
         }
     }
 }
