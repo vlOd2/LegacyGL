@@ -8,9 +8,12 @@ namespace ExampleGame
         [STAThread]
         public static void Main(string[] args)
         {
+            int w = 640;
+            int h = 480;
+            
             LGL.Init();
-            LGL.VWidth = 640;
-            LGL.VHeight = 480;
+            LGL.VWidth = w;
+            LGL.VHeight = h;
             LGL.VTitle = "Example Game";
             LGL.VResizable = true;
             LGL.Center();
@@ -20,6 +23,7 @@ namespace ExampleGame
             glLoadIdentity();
             glMatrixMode(GL_MODELVIEW);
             glLoadIdentity();
+            glViewport(0, 0, w, h);
             
             while (!LGL.ShouldClose)
             {
@@ -29,6 +33,13 @@ namespace ExampleGame
                 glVertex2f(0.5F, -0.5F);
                 glVertex2f(0F, 0.5F);
                 glEnd();
+
+                if (LGL.VWidth != w || LGL.VHeight != h)
+                {
+                    w = LGL.VWidth;
+                    h = LGL.VHeight;
+                    glViewport(0, 0, w, h);
+                }
                 
                 LGL.Update();
             }            

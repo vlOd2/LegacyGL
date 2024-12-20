@@ -12,20 +12,21 @@ namespace LegacyGL.Internal.X11Impl
         internal X11Viewport viewport;
         private X11GLLookup glLookup;
         private GLAPILoader apiLoader;
+        
         #region Properties
         public int VWidth
         {
-            get => viewport.Size.Width;
-            set => viewport.Size = new Size(value, VHeight);
+            get => viewport.Width;
+            set => viewport.Width = value;
         }
         public int VHeight
         {
-            get => viewport.Size.Height;
-            set => viewport.Size = new Size(VWidth, value);
+            get => viewport.Height;
+            set => viewport.Height = value;
         }
-        public string VTitle { get; set; }
+        public string VTitle { get => viewport.Title; set => viewport.Title = value; }
         public nint VIcon { get; set; }
-        public bool VResizable { get; set; }
+        public bool VResizable { get => viewport.Resizable; set => viewport.Resizable = value; }
         public bool ShouldClose => viewport.ShouldClose;
         public string ClipboardContent { get; set; }
         #endregion
