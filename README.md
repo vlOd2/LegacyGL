@@ -1,5 +1,6 @@
 # LegacyGL
-Low level OpenGL framework written in pure C# with no third party dependencies
+Easy to use (but low level) OpenGL framework written in pure C# with no third party dependencies<br>
+An example project is provided to get you started
 
 # ⚠ Incomplete
 This project is incomplete (specially when it comes to it's GLX support)<br>
