@@ -42,7 +42,6 @@ public static class Program
                 glViewport(0, 0, w, h);
             }
 
-            Thread.Sleep(1);
             LGL.Update();
         }
     }

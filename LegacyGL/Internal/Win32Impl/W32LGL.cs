@@ -84,8 +84,13 @@ internal unsafe class W32LGL : ILGL
             mouse.Init(viewport);
             InitAL();
 
-            // If this is NULL, V-sync isn't implemented??????
-            apiLoader.LoadDelegateGL<wglSwapIntervalEXT>("wglSwapIntervalEXT")?.Invoke(0);
+            wglSwapIntervalEXT wglSwapInterval = apiLoader.LoadDelegateGL<wglSwapIntervalEXT>("wglSwapIntervalEXT");
+            if (wglSwapInterval == null)
+            {
+                LGL.ErrorLogHandler("wglSwapIntervalEXT not found: swap interval control unavailable");
+                return;
+            }
+            wglSwapInterval(0);
         }
         catch
         {
