@@ -20,9 +20,7 @@ public class X11Viewport : IDisposable
     private XVisualInfo visualInfo;
     private nint glContext;
     private XAtom wmDeleteWindow;
-
     #region Properties
-
     public int Width
     {
         get
@@ -40,7 +38,6 @@ public class X11Viewport : IDisposable
             XSync(display, false);
         }
     }
-    
     public int Height
     {
         get
@@ -58,9 +55,7 @@ public class X11Viewport : IDisposable
             XSync(display, false);
         }
     }
-    
     public bool ShouldClose { get; private set; }
-
     public bool Resizable
     {
         get
@@ -98,7 +93,6 @@ public class X11Viewport : IDisposable
             XSync(display, false);
         }
     }
-
     public string Title
     {
         get

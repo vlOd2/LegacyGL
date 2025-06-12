@@ -3,7 +3,7 @@
 
 using System;
 
-namespace LegacyGL.Internal;
+namespace LegacyGL.Internal.Abstract;
 
 internal interface IKeyboard : IDisposable
 {

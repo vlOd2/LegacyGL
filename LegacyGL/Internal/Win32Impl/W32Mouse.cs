@@ -1,6 +1,7 @@
 ﻿// Copyright (c) vlOd
 // Licensed under the GNU Affero General Public License, version 3.0
 
+using LegacyGL.Internal.Abstract;
 using LegacyGL.Internal.Win32Impl.Native.Structs;
 using System.Collections.Generic;
 using System.Drawing;

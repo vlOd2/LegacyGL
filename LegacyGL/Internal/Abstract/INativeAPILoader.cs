@@ -1,7 +1,7 @@
 ﻿// Copyright (c) vlOd
 // Licensed under the GNU Affero General Public License, version 3.0
 
-namespace LegacyGL.Internal;
+namespace LegacyGL.Internal.Abstract;
 
 internal interface INativeAPILoader
 {

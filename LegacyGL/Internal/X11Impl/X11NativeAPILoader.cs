@@ -1,6 +1,7 @@
 // Copyright (c) vlOd
 // Licensed under the GNU Affero General Public License, version 3.0
 
+using LegacyGL.Internal.Abstract;
 using System.Runtime.InteropServices;
 using XLibSharp;
 

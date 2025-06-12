@@ -1,19 +1,21 @@
 ﻿// Copyright (c) vlOd
 // Licensed under the GNU Affero General Public License, version 3.0
 
-using LegacyGL.Internal;
+using LegacyGL.Internal.Abstract;
 using LegacyGL.Internal.Win32Impl;
 using LegacyGL.Internal.X11Impl;
-using System;
-using System.Drawing;
-using System.Threading;
+using System.Data.SqlTypes;
+using System.Text.RegularExpressions;
 
 namespace LegacyGL;
 
-public static class LGL
+public static partial class LGL
 {
+    internal const int DEFAULT_WIDTH = 800;
+    internal const int DEFAULT_HEIGHT = 600;
     private static ILGL instance;
-
+    public static Action<string> ErrorLogHandler = (s) => Console.Error.WriteLine($"[LegacyGL] {s}"); 
+    #region Properties
     /// <summary>
     /// The width of the viewport
     /// </summary>
@@ -60,11 +62,25 @@ public static class LGL
         get => GetPropSafe(instance.ClipboardContent);
         set => EnsureLoaded(() => instance.ClipboardContent = value);
     }
+    #endregion
+
+    [GeneratedRegex(@"(\d)\.(\d)(?:\.\d)?(?= )")]
+    private static partial Regex GLVersionRegex();
+
+    internal static (int, int) ParseGLVersion(string str)
+    {
+        Match match = GLVersionRegex().Match(str);
+        if (!match.Success)
+            throw new GLException("Could not figure out OpenGL version");
+        int major = int.Parse(match.Groups[1].Value);
+        int minor = int.Parse(match.Groups[2].Value);
+        return (major, minor);
+    }
 
     /// <summary>
     /// Loads the LegacyGL context and the viewport
     /// </summary>
-    public static void Init()
+    public static void Init(ref ContextRequest ctxReq)
     {
         if (instance != null)
             throw new GLException("Context already loaded");
@@ -84,7 +100,7 @@ public static class LGL
 
         try
         {
-            impl.Init();
+            impl.Init(ref ctxReq);
             Mouse.Init(impl.Mouse);
             Keyboard.Init(impl.Keyboard);
             instance = impl;

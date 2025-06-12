@@ -17,15 +17,15 @@ internal static class Utils
     //        return false;
 
     //    nint u32Lib = W32Libraries.GetModuleHandle("user32.dll");
-    //    if (u32Lib == NULLPTR)
+    //    if (u32Lib == 0)
     //        return false;
 
     //    nint getRawInputData = W32Libraries.GetProcAddress(u32Lib, "GetRawInputData");
     //    nint registerRawInputDevices = W32Libraries.GetProcAddress(u32Lib, "RegisterRawInputDevices");
     //    nint getRawInputDeviceList = W32Libraries.GetProcAddress(u32Lib, "GetRawInputDeviceList");
-    //    return getRawInputData != NULLPTR &&
-    //        registerRawInputDevices != NULLPTR &&
-    //        getRawInputDeviceList != NULLPTR;
+    //    return getRawInputData != 0 &&
+    //        registerRawInputDevices != 0 &&
+    //        getRawInputDeviceList != 0;
     //}
 
     public static long UnixMillis => (long)(DateTime.UtcNow - TIME_EPOCH).TotalMilliseconds;

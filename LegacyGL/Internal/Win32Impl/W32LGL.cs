@@ -1,6 +1,7 @@
 ﻿// Copyright (c) vlOd
 // Licensed under the GNU Affero General Public License, version 3.0
 
+using LegacyGL.Internal.Abstract;
 using LegacyGL.Internal.Win32Impl.Native;
 using System.Drawing;
 using System.Runtime.InteropServices;
@@ -38,7 +39,7 @@ internal unsafe class W32LGL : ILGL
     {
         get
         {
-            if (!OpenClipboard(NULLPTR))
+            if (!OpenClipboard(0))
                 return "";
             nint handle = GetClipboardData(CF_TEXT);
             string data = Marshal.PtrToStringAnsi(handle);
@@ -47,7 +48,7 @@ internal unsafe class W32LGL : ILGL
         }
         set
         {
-            if (!OpenClipboard(NULLPTR))
+            if (!OpenClipboard(0))
                 return;
             nint handle = Marshal.StringToHGlobalAnsi(value);
             SetClipboardData(CF_TEXT, handle);
@@ -62,32 +63,53 @@ internal unsafe class W32LGL : ILGL
 
     private delegate bool wglSwapIntervalEXT(int interval);
 
-    public void Init()
+    public void Init(ref ContextRequest ctxReq)
     {
         try
         {
             glLib = W32Libraries.LoadLibraryA(GL_LIBRARY);
-            alLib = W32Libraries.LoadLibraryA(AL_LIBRARY);
-
+            if (glLib == 0)
+                throw new GLException($"Could not load OpenGL: LoadLibraryA failed ({GL_LIBRARY})");
             apiLoader = new W32NativeAPILoader(glLib, alLib);
+
             viewport = new W32Viewport();
+            if (!viewport.CreateWindow())
+                throw new GLException("Could not initialize display");
+            if (!viewport.CreateContext(ref ctxReq, apiLoader))
+                throw new GLException("Pixel format not accelerated");
+
             keyboard = new W32Keyboard();
-            mouse = new W32Mouse();
-
-            viewport.SetupGLContext(apiLoader);
             keyboard.Init(viewport);
+            mouse = new W32Mouse();
             mouse.Init(viewport);
+            InitAL();
 
-            if (!viewport.HasGLContext)
-                throw new GLException("Viewport has no GL context");
-
-            // XXX: If this is NULL, V-sync isn't implemented?
+            // If this is NULL, V-sync isn't implemented??????
             apiLoader.LoadDelegateGL<wglSwapIntervalEXT>("wglSwapIntervalEXT")?.Invoke(0);
         }
         catch
         {
             Dispose();
             throw;
+        }
+    }
+
+    private void InitAL()
+    {
+        alLib = W32Libraries.LoadLibraryA(AL_LIBRARY);
+        if (alLib == 0)
+        {
+            LGL.ErrorLogHandler($"Could not load OpenAL: LoadLibraryA failed ({AL_LIBRARY})");
+            return;
+        }
+        try
+        {
+            ALLoader.Load(apiLoader);
+        }
+        catch (Exception ex)
+        {
+            LGL.ErrorLogHandler($"Could not load OpenAL: {ex}");
+            ALLoader.Unload();
         }
     }
 
@@ -103,16 +125,17 @@ internal unsafe class W32LGL : ILGL
 
         try
         {
-            if (glLib != NULLPTR)
+            if (glLib != 0)
                 W32Libraries.FreeLibrary(glLib);
-            if (alLib != NULLPTR)
+            if (alLib != 0)
                 W32Libraries.FreeLibrary(alLib);
         }
         catch { }
 
-        glLib = NULLPTR;
-        alLib = NULLPTR;
+        glLib = 0;
+        alLib = 0;
         apiLoader = null;
+        ALLoader.Unload();
 
         mouse = null;
         keyboard = null;

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) vlOd
 // Licensed under the GNU Affero General Public License, version 3.0
 
+using LegacyGL.Internal.Abstract;
 using static LegacyGL.Internal.Win32Impl.Native.W32Input;
 
 namespace LegacyGL.Internal.Win32Impl;
@@ -58,7 +59,7 @@ internal class W32Keyboard : IKeyboard
             char c = TranslateVK(vk, sc, kbState);
             EnqueueKeyEvent(vk, c, state, repeat);
 
-            //Console.WriteLine($"{(state ? "Pressed" : "Released")} {c} (0x{vk:X2}) {repeat}");
+            Console.WriteLine($"{(state ? "Pressed" : "Released")} {c} (0x{vk:X2}) {repeat}");
         }
     }
 

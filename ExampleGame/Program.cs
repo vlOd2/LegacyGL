@@ -1,5 +1,5 @@
 ﻿using LegacyGL;
-using static LegacyGL.OpenGL.GL;
+using static LegacyGL.Bindings.GL10;
 
 namespace ExampleGame;
 
@@ -10,8 +10,9 @@ public static class Program
     {
         int w = 640;
         int h = 480;
-        
-        LGL.Init();
+
+        ContextRequest ctxReq = new();
+        LGL.Init(ref ctxReq);
         LGL.VWidth = w;
         LGL.VHeight = h;
         LGL.VTitle = "Example Game";
@@ -41,7 +42,8 @@ public static class Program
                 glViewport(0, 0, w, h);
             }
             
+            Thread.Sleep(1);
             LGL.Update();
-        }            
+        }
     }
 }   

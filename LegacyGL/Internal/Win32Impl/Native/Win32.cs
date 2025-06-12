@@ -8,7 +8,6 @@ namespace LegacyGL.Internal.Win32Impl.Native;
 
 internal static class Win32
 {
-    public static readonly nint NULLPTR = nint.Zero;
     public const int CW_USEDEFAULT = unchecked((int)0x80000000);
 
     [DllImport("user32.dll")]

@@ -3,7 +3,7 @@
 
 using System.Drawing;
 using LegacyGL;
-using LegacyGL.Internal;
+using LegacyGL.Internal.Abstract;
 
 namespace ZeroCraft.LegacyGL.Internal.X11Impl;
 

@@ -1,13 +1,13 @@
 ﻿// Copyright (c) vlOd
 // Licensed under the GNU Affero General Public License, version 3.0
 
-using LegacyGL.Internal.Win32Impl.Native;
-using LegacyGL.Internal.Win32Impl.Native.Const;
-using LegacyGL.Internal.Win32Impl.Native.Structs;
 using System.Collections.Concurrent;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text;
+using LegacyGL.Internal.Win32Impl.Native;
+using LegacyGL.Internal.Win32Impl.Native.Const;
+using LegacyGL.Internal.Win32Impl.Native.Structs;
 using static LegacyGL.Internal.Win32Impl.Native.Const.W32ConstCS;
 using static LegacyGL.Internal.Win32Impl.Native.Const.W32ConstGCLP;
 using static LegacyGL.Internal.Win32Impl.Native.Const.W32ConstGWL;
@@ -18,38 +18,30 @@ using static LegacyGL.Internal.Win32Impl.Native.Const.W32ConstSW;
 using static LegacyGL.Internal.Win32Impl.Native.Const.W32ConstSWP;
 using static LegacyGL.Internal.Win32Impl.Native.Const.W32ConstWM;
 using static LegacyGL.Internal.Win32Impl.Native.Const.W32ConstWS;
+using static LegacyGL.Internal.Win32Impl.Native.Const.W32ConstWGLARB;
 using static LegacyGL.Internal.Win32Impl.Native.W32Painting;
 using static LegacyGL.Internal.Win32Impl.Native.W32PixelFormat;
 using static LegacyGL.Internal.Win32Impl.Native.W32WGL;
 using static LegacyGL.Internal.Win32Impl.Native.W32Windowing;
 using static LegacyGL.Internal.Win32Impl.Native.Win32;
+using LegacyGL.Bindings;
 
 namespace LegacyGL.Internal.Win32Impl;
 
-internal class W32Viewport : IDisposable
+internal unsafe class W32Viewport : IDisposable
 {
     private const string CLASS_NAME = "LegacyGLWnd";
-    #region WGL ARB Constants
-    private const int WGL_CONTEXT_MAJOR_VERSION_ARB = 0x2091;
-    private const int WGL_CONTEXT_MINOR_VERSION_ARB = 0x2092;
-    private const int WGL_CONTEXT_LAYER_PLANE_ARB = 0x2093;
-    private const int WGL_CONTEXT_FLAGS_ARB = 0x2094;
-    private const int WGL_CONTEXT_PROFILE_MASK_ARB = 0x9126;
-    private const int WGL_CONTEXT_DEBUG_BIT_ARB = 0x0001;
-    private const int WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB = 0x0002;
-    private const int WGL_CONTEXT_CORE_PROFILE_BIT_ARB = 0x00000001;
-    private const int WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB = 0x00000002;
-    #endregion
+    private const uint WINDOW_STYLES = WS_OVERLAPPEDWINDOW & ~WS_THICKFRAME & ~WS_MAXIMIZEBOX;
+    private nint hInstance;
     private WNDCLASS wndClass;
     public nint Handle;
     private nint icon;
     private nint deviceContext;
-    private nint glContext;
+    private nint wglContext;
     public readonly ConcurrentQueue<W32KBEvent> KeyboardEvents = [];
     public bool CursorHidden;
     public float ScrollWheel;
     #region Properties
-    public bool HasGLContext => glContext != NULLPTR;
     public Point Position
     {
         get
@@ -101,7 +93,7 @@ internal class W32Viewport : IDisposable
 
             int w = rect.right - rect.left;
             int h = rect.bottom - rect.top;
-            SetWindowPos(Handle, NULLPTR, x, y, w, h, SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOMOVE);
+            SetWindowPos(Handle, 0, x, y, w, h, SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOMOVE);
         }
     }
     public string Title
@@ -149,56 +141,14 @@ internal class W32Viewport : IDisposable
                 SetWindowLongA(Handle, GWL_STYLE, style);
             }
 
-            SetWindowPos(Handle, NULLPTR, x, y, w, h, SWP_SHOWWINDOW);
+            SetWindowPos(Handle, 0, x, y, w, h, SWP_SHOWWINDOW);
         }
     }
     #endregion
 
-    public W32Viewport()
-    {
-        nint module = Marshal.GetHINSTANCE(typeof(W32Viewport).Module);
-        wndClass = new WNDCLASS()
-        {
-            style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC,
-            lpfnWndProc = WndProc,
-            hInstance = module,
-            lpszClassName = CLASS_NAME,
-            hCursor = LoadCursorA(NULLPTR, IDC_ARROW)
-        };
-
-        if (RegisterClassA(ref wndClass) == 0)
-            throw new GLException("RegisterClassA");
-
-        Handle = CreateWindowExA(0, CLASS_NAME, "Game",
-            WS_OVERLAPPEDWINDOW & ~WS_THICKFRAME & ~WS_MAXIMIZEBOX,
-            CW_USEDEFAULT, CW_USEDEFAULT, 800, 600,
-            NULLPTR, NULLPTR, module, NULLPTR);
-
-        if (Handle == NULLPTR)
-            throw new GLException("CreateWindowExA");
-
-        ShowWindow(Handle, SW_NORMAL);
-        UpdateWindow(Handle);
-    }
-
-    #region Setup functions
-    public static PIXELFORMATDESCRIPTOR BuildPixelFormat()
-    {
-        PIXELFORMATDESCRIPTOR pixelFormat = new PIXELFORMATDESCRIPTOR();
-        pixelFormat.nSize = SizeOf<PIXELFORMATDESCRIPTOR>();
-        pixelFormat.nVersion = 1;
-        pixelFormat.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
-        pixelFormat.iPixelType = PFD_TYPE_RGBA;
-        pixelFormat.cColorBits = 32;
-        pixelFormat.cDepthBits = 32;
-        pixelFormat.cStencilBits = 8;
-        pixelFormat.iLayerType = PFD_MAIN_PLANE;
-        return pixelFormat;
-    }
-
     public static void DumpPixelFormat(nint deviceContext, int format)
     {
-        PIXELFORMATDESCRIPTOR pixelFormat = new PIXELFORMATDESCRIPTOR();
+        PIXELFORMATDESCRIPTOR pixelFormat = new();
         DescribePixelFormat(deviceContext, format, SizeOf<PIXELFORMATDESCRIPTOR>(), ref pixelFormat);
         Console.WriteLine($"{format} @ {deviceContext}");
         Console.WriteLine($"----------------------------------");
@@ -210,56 +160,175 @@ internal class W32Viewport : IDisposable
         Console.WriteLine($"----------------------------------");
     }
 
-    private delegate nint wglCreateContextAttribsARB(nint hdc, nint hshareContext, int[] attribList);
+    #region Setup functions
+    public bool CreateWindow()
+    {
+        // Probably not needed, keeping it just in case :tm:
+        hInstance = Marshal.GetHINSTANCE(typeof(W32Viewport).Module);
 
-    private nint CreateGLContext()
+        wndClass = new WNDCLASS()
+        {
+            style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC,
+            lpfnWndProc = WndProc,
+            hInstance = hInstance,
+            lpszClassName = CLASS_NAME,
+            hCursor = LoadCursorA(0, IDC_ARROW)
+        };
+
+        if (RegisterClassA(ref wndClass) == 0)
+        {
+            Dispose();
+            LGL.ErrorLogHandler("Could not create window class");
+            return false;
+        }
+
+        Handle = CreateWindowExA(0, CLASS_NAME, "Game", WINDOW_STYLES,
+            CW_USEDEFAULT, CW_USEDEFAULT,
+            LGL.DEFAULT_WIDTH, LGL.DEFAULT_HEIGHT,
+            0, 0, hInstance, 0);
+
+        if (Handle == 0)
+        {
+            Dispose();
+            LGL.ErrorLogHandler("Could not create window");
+            return false;
+        }
+
+        ShowWindow(Handle, SW_SHOW);
+        UpdateWindow(Handle);
+
+        deviceContext = GetDC(Handle);
+        if (deviceContext == 0)
+        {
+            Dispose();
+            LGL.ErrorLogHandler("Could not create device context");
+            return false;
+        }
+
+        return true;
+    }
+
+    private nint CreateBasicWGLContext()
     {
         nint context = wglCreateContext(deviceContext);
 
-        if (context == NULLPTR)
-            throw new GLException("wglCreateContext");
+        if (context == 0)
+        {
+            LGL.ErrorLogHandler("Could not create context");
+            return 0;
+        }
 
         if (!wglMakeCurrent(deviceContext, context))
-            throw new GLException("wglMakeCurrent");
+        {
+            LGL.ErrorLogHandler("Could not make context current");
+            return 0;
+        }
 
         return context;
     }
 
-    public void SetupGLContext(W32NativeAPILoader lookup)
+    private nint CreateExtWGLContext(ref ContextRequest ctxReq, wglCreateContextAttribsARB createContextARB)
     {
-        deviceContext = GetDC(Handle);
-        PIXELFORMATDESCRIPTOR pixelFormat = BuildPixelFormat();
+        List<int> attrib = [
+            WGL_CONTEXT_MAJOR_VERSION_ARB, ctxReq.GLMajorVer,
+            WGL_CONTEXT_MINOR_VERSION_ARB, ctxReq.GLMinorVer
+        ];
+        attrib.Add(WGL_CONTEXT_PROFILE_MASK_ARB);
+        if (ctxReq.GLES)
+            attrib.Add(WGL_CONTEXT_ES2_PROFILE_BIT_EXT);
+        else if (ctxReq.Core)
+            attrib.Add(WGL_CONTEXT_CORE_PROFILE_BIT_ARB);
+        else
+            attrib.Add(WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB);
+        attrib.Add(0x00); // End of attributes
+
+        nint context = createContextARB(deviceContext, 0, [..attrib]);
+        if (context == 0)
+        {
+            LGL.ErrorLogHandler("Could not create context");
+            return 0;
+        }
+
+        if (!wglMakeCurrent(deviceContext, context))
+        {
+            LGL.ErrorLogHandler("Could not make context current");
+            return 0;
+        }
+
+        return context;
+    }
+
+    public bool CreateContext(ref ContextRequest ctxReq, W32NativeAPILoader loader)
+    {
+        PIXELFORMATDESCRIPTOR pixelFormat = new()
+        {
+            nSize = SizeOf<PIXELFORMATDESCRIPTOR>(),
+            nVersion = 1,
+            dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
+            iPixelType = PFD_TYPE_RGBA,
+            cColorBits = ctxReq.ColorBits,
+            cDepthBits = ctxReq.DepthBits,
+            cStencilBits = ctxReq.StencilBits,
+            iLayerType = PFD_MAIN_PLANE
+        };
 
         int format = ChoosePixelFormat(deviceContext, ref pixelFormat);
         if (format == 0)
-            throw new GLException("ChoosePixelFormat");
-
+        {
+            LGL.ErrorLogHandler("Could not find a matching pixel format");
+            return false;
+        }
         DumpPixelFormat(deviceContext, format);
-        if (!SetPixelFormat(deviceContext, format, ref pixelFormat))
-            throw new GLException("SetPixelFormat");
 
-        nint tempContext = CreateGLContext();
-        wglCreateContextAttribsARB createContextARB = lookup.LoadDelegateGL<wglCreateContextAttribsARB>("wglCreateContextAttribsARB");
+        if (!SetPixelFormat(deviceContext, format, ref pixelFormat))
+        {
+            LGL.ErrorLogHandler("Could not set the pixel format");
+            return false;
+        }
+
+        nint tempContext = CreateBasicWGLContext();
+        if (tempContext == 0)
+            return false;
+        wglCreateContextAttribsARB createContextARB = loader.LoadDelegateGL<wglCreateContextAttribsARB>("wglCreateContextAttribsARB");
         wglDeleteContext(tempContext);
 
         if (createContextARB == null)
         {
-            Console.Error.WriteLine("Couldn't find wglCreateContextAttribsARB");
-            glContext = CreateGLContext();
-            return;
+            if (ctxReq.Core || ctxReq.GLES)
+            {
+                LGL.ErrorLogHandler("No WGL context extension, cannot satisfy context request");
+                return false;
+            }
+            wglContext = CreateBasicWGLContext();
+        }
+        else
+            wglContext = CreateExtWGLContext(ref ctxReq, createContextARB);
+
+        return LoadGLAPI(ref ctxReq, loader);
+    }
+
+    // This also loads the GL API bindings
+    private bool LoadGLAPI(ref ContextRequest ctxReq, W32NativeAPILoader loader)
+    {
+        if (wglContext == 0)
+            return false;
+        GLLoader.Load(loader, ctxReq.GLES);
+
+        byte* versionPtr = GL10.glGetString(GL10.GL_VERSION);
+        if (versionPtr == null)
+        {
+            LGL.ErrorLogHandler("Created context is fucky wacky, throw your GPU in the dumpster");
+            return false;
         }
 
-        glContext = createContextARB(deviceContext, NULLPTR, new int[]
+        (int, int) version = LGL.ParseGLVersion(new LGLString(versionPtr));
+        if (version.Item1 < ctxReq.GLMajorVer || (version.Item1 == ctxReq.GLMajorVer && version.Item2 < ctxReq.GLMinorVer))
         {
-            WGL_CONTEXT_MAJOR_VERSION_ARB, 1,
-            WGL_CONTEXT_MINOR_VERSION_ARB, 1,
-            0x00 // End of attributes
-        });
-        if (glContext == NULLPTR)
-            throw new GLException("wglCreateContextAttribsARB");
+            LGL.ErrorLogHandler("Created context version does not satisfy context request");
+            return false;
+        }
 
-        if (!wglMakeCurrent(deviceContext, glContext))
-            throw new GLException("wglMakeCurrent");
+        return true;
     }
     #endregion
 
@@ -273,13 +342,13 @@ internal class W32Viewport : IDisposable
         int h = rect.bottom - rect.top;
         int x = sw / 2 - w / 2;
         int y = sh / 2 - h / 2;
-        SetWindowPos(Handle, NULLPTR, x, y, w, h, SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOSIZE);
+        SetWindowPos(Handle, 0, x, y, w, h, SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOSIZE);
     }
 
     public void Poll()
     {
         MSG msg = new();
-        if (PeekMessageA(ref msg, NULLPTR, 0, 0, PM_REMOVE))
+        if (PeekMessageA(ref msg, 0, 0, 0, PM_REMOVE))
         {
             TranslateMessage(ref msg);
             DispatchMessageA(ref msg);
@@ -303,7 +372,7 @@ internal class W32Viewport : IDisposable
         {
             case WM_PAINT:
                 {
-                    PAINTSTRUCT paintStruct = new PAINTSTRUCT();
+                    PAINTSTRUCT paintStruct = new();
                     BeginPaint(hWnd, ref paintStruct);
                     EndPaint(hWnd, ref paintStruct);
                     break;
@@ -334,7 +403,7 @@ internal class W32Viewport : IDisposable
             case WM_SETCURSOR:
                 if (CursorHidden)
                 {
-                    SetCursor(NULLPTR);
+                    SetCursor(0);
                     break;
                 }
                 goto default;
@@ -357,22 +426,31 @@ internal class W32Viewport : IDisposable
                 return DefWindowProcA(hWnd, uMsg, wParam, lParam);
         }
 
-        return NULLPTR;
+        return 0;
     }
 
     public void Dispose()
     {
         KeyboardEvents.Clear();
 
-        wglDeleteContext(glContext);
-        ReleaseDC(Handle, deviceContext);
-        DestroyWindow(Handle);
+        if (wglContext != 0)
+            wglDeleteContext(wglContext);
+        if (deviceContext != 0)
+            _ = ReleaseDC(Handle, deviceContext);
+        if (Handle != 0)
+        {
+            DestroyWindow(Handle);
+            UnregisterClassA(CLASS_NAME, hInstance);
+        }
+        GLLoader.Unload();
+
         // TODO: Call this somewhere
         // Right now it fucks up msg boxes so keep it disabled for now
         //PostQuitMessage(0);
 
-        glContext = NULLPTR;
-        deviceContext = NULLPTR;
-        Handle = NULLPTR;
+        wglContext = 0;
+        deviceContext = 0;
+        Handle = 0;
+        hInstance = 0;
     }
 }

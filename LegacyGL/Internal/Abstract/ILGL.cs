@@ -1,7 +1,7 @@
 ﻿// Copyright (c) vlOd
 // Licensed under the GNU Affero General Public License, version 3.0
 
-namespace LegacyGL.Internal;
+namespace LegacyGL.Internal.Abstract;
 
 internal interface ILGL : IDisposable
 {
@@ -16,7 +16,7 @@ internal interface ILGL : IDisposable
     IMouse Mouse { get; }
     INativeAPILoader APILoader { get; }
 
-    void Init();
+    void Init(ref ContextRequest ctxReq);
     void Center();
     void Flush();
     void Poll();

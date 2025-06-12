@@ -13,6 +13,10 @@ internal static class W32Windowing
     [DllImport("user32.dll")]
     public static extern short RegisterClassA(ref WNDCLASS lpWndClass);
 
+    [DllImport("user32.dll", EntryPoint = "UnregisterClassA")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool UnregisterClassA([In()][MarshalAs(UnmanagedType.LPStr)] string lpClassName, nint hInstance);
+
     [DllImport("user32.dll")]
     public static extern int SetClassLongA(nint hWnd, int nIndex, int dwNewLong);
 

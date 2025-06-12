@@ -4,7 +4,7 @@
 using System;
 using System.Drawing;
 
-namespace LegacyGL.Internal;
+namespace LegacyGL.Internal.Abstract;
 
 internal interface IMouse : IDisposable
 {

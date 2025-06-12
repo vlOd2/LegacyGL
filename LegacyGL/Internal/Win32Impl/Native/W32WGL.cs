@@ -1,10 +1,11 @@
 ﻿// Copyright (c) vlOd
 // Licensed under the GNU Affero General Public License, version 3.0
 
-using System;
 using System.Runtime.InteropServices;
 
 namespace LegacyGL.Internal.Win32Impl.Native;
+
+internal delegate nint wglCreateContextAttribsARB(nint hdc, nint hshareContext, int[] attribList);
 
 internal static class W32WGL
 {

@@ -1,8 +1,7 @@
 // Copyright (c) vlOd
 // Licensed under the GNU Affero General Public License, version 3.0
 
-using System.Drawing;
-using XLibSharp;
+using LegacyGL.Internal.Abstract;
 using ZeroCraft.LegacyGL.Internal.X11Impl;
 
 namespace LegacyGL.Internal.X11Impl;
@@ -10,9 +9,9 @@ namespace LegacyGL.Internal.X11Impl;
 internal class X11LGL : ILGL
 {
     internal X11Viewport viewport;
-    private X11NativeAPILoader glLookup;
-    private GLAPILoader apiLoader;
-    
+    private X11NativeAPILoader apiLoader;
+    private X11Keyboard keyboard;
+    private X11Mouse mouse;
     #region Properties
     public int VWidth
     {
@@ -28,35 +27,26 @@ internal class X11LGL : ILGL
     public nint VIcon { get; set; }
     public bool VResizable { get => viewport.Resizable; set => viewport.Resizable = value; }
     public bool ShouldClose => viewport.ShouldClose;
-    public string ClipboardContent { get; set; }
+    public string ClipboardContent { get => ""; set { } }
+    public IKeyboard Keyboard => keyboard;
+    public IMouse Mouse => mouse;
+    public INativeAPILoader APILoader => apiLoader;
     #endregion
-    
-    public void Init() 
+
+    public void Init(ref ContextRequest ctxReq) 
     {
         try
         {
-            glLookup = new X11NativeAPILoader();
-            apiLoader = new GLAPILoader(glLookup);
+            apiLoader = new X11NativeAPILoader();
             viewport = new X11Viewport();
-            apiLoader.Load();
+            keyboard = new X11Keyboard();
+            mouse = new X11Mouse();
         }
-        catch (Exception e)
+        catch (Exception)
         {
             Dispose();
             throw;
         }
-    }
-
-    public IKeyboard GetKeyboard() 
-    {
-        X11Keyboard keyboard = new X11Keyboard();
-        return keyboard;
-    }
-
-    public IMouse GetMouse() 
-    {
-        X11Mouse mouse = new X11Mouse();
-        return mouse;
     }
 
     public void Center() => viewport.Center();
@@ -67,9 +57,10 @@ internal class X11LGL : ILGL
 
     public void Dispose()
     {
-        apiLoader?.Unload();
         viewport?.Dispose();
-        glLookup = null;
+        apiLoader = null;
+        keyboard = null;
+        mouse = null;
         viewport = null;
     }
 }
