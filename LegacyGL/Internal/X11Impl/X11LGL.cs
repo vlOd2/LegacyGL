@@ -39,6 +39,7 @@ internal class X11LGL : ILGL
         {
             apiLoader = new X11NativeAPILoader();
             viewport = new X11Viewport();
+            GLLoader.Load(apiLoader, false);
             keyboard = new X11Keyboard();
             mouse = new X11Mouse();
         }
@@ -58,6 +59,7 @@ internal class X11LGL : ILGL
     public void Dispose()
     {
         viewport?.Dispose();
+        GLLoader.Unload();
         apiLoader = null;
         keyboard = null;
         mouse = null;
