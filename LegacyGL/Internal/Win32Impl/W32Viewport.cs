@@ -146,20 +146,6 @@ internal unsafe class W32Viewport : IDisposable
     }
     #endregion
 
-    public static void DumpPixelFormat(nint deviceContext, int format)
-    {
-        PIXELFORMATDESCRIPTOR pixelFormat = new();
-        DescribePixelFormat(deviceContext, format, SizeOf<PIXELFORMATDESCRIPTOR>(), ref pixelFormat);
-        Console.WriteLine($"{format} @ {deviceContext}");
-        Console.WriteLine($"----------------------------------");
-        Console.WriteLine($"Flags: {pixelFormat.dwFlags}");
-        Console.WriteLine($"Pixel type: {pixelFormat.iPixelType}");
-        Console.WriteLine($"Color buffer bits: {pixelFormat.cColorBits}");
-        Console.WriteLine($"Depth buffer bits: {pixelFormat.cDepthBits}");
-        Console.WriteLine($"Stencil buffer bits: {pixelFormat.cStencilBits}");
-        Console.WriteLine($"----------------------------------");
-    }
-
     #region Setup functions
     public bool CreateWindow()
     {
@@ -277,7 +263,6 @@ internal unsafe class W32Viewport : IDisposable
             LGL.ErrorLogHandler("Could not find a matching pixel format");
             return false;
         }
-        DumpPixelFormat(deviceContext, format);
 
         if (!SetPixelFormat(deviceContext, format, ref pixelFormat))
         {
