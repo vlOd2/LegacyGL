@@ -31,10 +31,11 @@ namespace LegacyGL.Internal.Win32Impl;
 internal unsafe class W32Viewport : IDisposable
 {
     private const string CLASS_NAME = "LegacyGLWnd";
-    private const uint WINDOW_STYLES = WS_OVERLAPPEDWINDOW & ~WS_THICKFRAME & ~WS_MAXIMIZEBOX;
+    private const uint WINDOW_STYLES = WS_OVERLAPPEDWINDOW & ~WS_THICKFRAME & ~WS_MAXIMIZEBOX & ~WS_VISIBLE;
     private nint hInstance;
     private WNDCLASS wndClass;
     public nint Handle;
+    private bool shownAfterInit;
     private nint icon;
     private nint deviceContext;
     private nint wglContext;
@@ -178,9 +179,6 @@ internal unsafe class W32Viewport : IDisposable
             LGL.ErrorLogHandler("Could not create window");
             return false;
         }
-
-        ShowWindow(Handle, SW_SHOW);
-        UpdateWindow(Handle);
 
         deviceContext = GetDC(Handle);
         if (deviceContext == 0)
@@ -331,6 +329,12 @@ internal unsafe class W32Viewport : IDisposable
 
     public void Poll()
     {
+        if (!shownAfterInit)
+        {
+            shownAfterInit = true;
+            ShowWindow(Handle, SW_SHOW);
+            UpdateWindow(Handle);
+        }
         MSG msg = new();
         if (PeekMessageA(ref msg, 0, 0, 0, PM_REMOVE))
         {
