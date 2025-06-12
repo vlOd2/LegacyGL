@@ -163,7 +163,6 @@ internal unsafe class W32Viewport : IDisposable
     #region Setup functions
     public bool CreateWindow()
     {
-        // Probably not needed, keeping it just in case :tm:
         hInstance = Marshal.GetHINSTANCE(typeof(W32Viewport).Module);
 
         wndClass = new WNDCLASS()
@@ -417,10 +416,8 @@ internal unsafe class W32Viewport : IDisposable
                 break;
 
             case WM_MOUSEWHEEL:
-                {
-                    ScrollWheel = (short)(((int)wParam >> 16) & 0xFFFF);
-                    break;
-                }
+                ScrollWheel = (short)(((int)wParam >> 16) & 0xFFFF);
+                break;
 
             default:
                 return DefWindowProcA(hWnd, uMsg, wParam, lParam);

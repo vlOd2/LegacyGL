@@ -25,7 +25,7 @@ public static class Program
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
         glViewport(0, 0, w, h);
-        
+
         while (!LGL.ShouldClose)
         {
             glClear(GL_COLOR_BUFFER_BIT);
@@ -41,7 +41,7 @@ public static class Program
                 h = LGL.VHeight;
                 glViewport(0, 0, w, h);
             }
-            
+
             Thread.Sleep(1);
             LGL.Update();
         }

@@ -11,9 +11,10 @@ namespace LegacyGL.Internal.Win32Impl.Native.Structs;
 internal struct MSG
 {
     public nint hwnd;
-    public int message;
-    public int wParam;
-    public int lParam;
+    public uint message;
+    public nint wParam;
+    public nint lParam;
     public int time;
     public Point pt;
+    public int lPrivate;
 }
