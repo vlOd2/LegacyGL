@@ -1,6 +1,7 @@
 ﻿// Copyright (c) vlOd
 // Licensed under the GNU Affero General Public License, version 3.0
 
+using LegacyGL.Internal;
 using LegacyGL.Internal.Abstract;
 using LegacyGL.Internal.Win32Impl;
 using LegacyGL.Internal.X11Impl;
@@ -14,6 +15,10 @@ public static partial class LGL
     internal const int DEFAULT_WIDTH = 800;
     internal const int DEFAULT_HEIGHT = 600;
     private static ILGL instance;
+    /// <summary>
+    /// Handler for detailed error information<br/>
+    /// Default implementation prints everything to stderr
+    /// </summary>
     public static Action<string> ErrorLogHandler = (s) => Console.Error.WriteLine($"[LegacyGL] {s}"); 
     #region Properties
     /// <summary>
@@ -56,12 +61,22 @@ public static partial class LGL
         get => GetPropSafe(instance.VResizable);
         set => EnsureLoaded(() => instance.VResizable = value);
     }
+    /// <summary>
+    /// If the viewport has been requested to close
+    /// </summary>
     public static bool ShouldClose => instance.ShouldClose;
+    /// <summary>
+    /// The system text clipboard
+    /// </summary>
     public static string ClipboardContent
     {
         get => GetPropSafe(instance.ClipboardContent);
         set => EnsureLoaded(() => instance.ClipboardContent = value);
     }
+    /// <summary>
+    /// Whether OpenAL APIs are available and can be used
+    /// </summary>
+    public static bool IsALAvailable => ALLoader.Loaded;
     #endregion
 
     [GeneratedRegex(@"(\d)\.(\d)(?:\.\d)?(?= )")]
