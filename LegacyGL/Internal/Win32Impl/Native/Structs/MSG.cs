@@ -5,16 +5,15 @@ using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
 
-namespace LegacyGL.Internal.Win32Impl.Native.Structs
+namespace LegacyGL.Internal.Win32Impl.Native.Structs;
+
+[StructLayout(LayoutKind.Sequential)]
+internal struct MSG
 {
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct MSG
-    {
-        public nint hwnd;
-        public int message;
-        public int wParam;
-        public int lParam;
-        public int time;
-        public Point pt;
-    }
+    public nint hwnd;
+    public int message;
+    public int wParam;
+    public int lParam;
+    public int time;
+    public Point pt;
 }

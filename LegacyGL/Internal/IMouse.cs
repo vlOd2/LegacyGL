@@ -4,18 +4,17 @@
 using System;
 using System.Drawing;
 
-namespace LegacyGL.Internal
+namespace LegacyGL.Internal;
+
+internal interface IMouse : IDisposable
 {
-    internal interface IMouse : IDisposable
-    {
-        Point Position { get; set; }
-        Point Delta { get; }
-        bool Captured { get; set; }
-        bool LeftButton { get; }
-        bool MiddleButton { get; }
-        bool RightButton { get; }
-        float ScrollWheel { get; }
-        void Poll();
-        bool Next(out InputEvent @event);
-    }
+    Point Position { get; set; }
+    Point Delta { get; }
+    bool Captured { get; set; }
+    bool LeftButton { get; }
+    bool MiddleButton { get; }
+    bool RightButton { get; }
+    float ScrollWheel { get; }
+    void Poll();
+    bool Next(out InputEvent e);
 }

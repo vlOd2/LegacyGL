@@ -2,122 +2,120 @@
 // Licensed under the GNU Affero General Public License, version 3.0
 
 using LegacyGL.Internal.Win32Impl.Native;
-using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using static LegacyGL.Internal.Win32Impl.Native.W32Clipboard;
 using static LegacyGL.Internal.Win32Impl.Native.Win32;
 
-namespace LegacyGL.Internal.Win32Impl
+namespace LegacyGL.Internal.Win32Impl;
+
+internal unsafe class W32LGL : ILGL
 {
-    internal class W32LGL : ILGL
+    private const string GL_LIBRARY = "OpenGL32.dll";
+    private const string AL_LIBRARY = "OpenAL32.dll";
+    private nint glLib;
+    private nint alLib;
+    internal W32Viewport viewport;
+    internal W32Keyboard keyboard;
+    internal W32Mouse mouse;
+    internal W32NativeAPILoader apiLoader;
+    #region Properties
+    public int VWidth
     {
-        private const string GL_LIBRARY = "OpenGL32.dll";
-        private nint glLib;
-        private W32GLLookup glLookup;
-        private GLAPILoader apiLoader;
-        internal W32Viewport viewport;
-
-        #region Properties
-        public int VWidth
+        get => viewport.ClientSize.Width;
+        set => viewport.ClientSize = new Size(value, VHeight);
+    }
+    public int VHeight
+    {
+        get => viewport.ClientSize.Height;
+        set => viewport.ClientSize = new Size(VWidth, value);
+    }
+    public string VTitle { get => viewport.Title; set => viewport.Title = value; }
+    public nint VIcon { get => viewport.Icon; set => viewport.Icon = value; }
+    public bool VResizable { get => viewport.Resizable; set => viewport.Resizable = value; }
+    public bool ShouldClose => viewport.ShouldClose;
+    public string ClipboardContent
+    {
+        get
         {
-            get => viewport.ClientSize.Width;
-            set => viewport.ClientSize = new Size(value, VHeight);
+            if (!OpenClipboard(NULLPTR))
+                return "";
+            nint handle = GetClipboardData(CF_TEXT);
+            string data = Marshal.PtrToStringAnsi(handle);
+            CloseClipboard();
+            return data ?? "";
         }
-        public int VHeight
+        set
         {
-            get => viewport.ClientSize.Height;
-            set => viewport.ClientSize = new Size(VWidth, value);
+            if (!OpenClipboard(NULLPTR))
+                return;
+            nint handle = Marshal.StringToHGlobalAnsi(value);
+            SetClipboardData(CF_TEXT, handle);
+            Marshal.FreeHGlobal(handle);
+            CloseClipboard();
         }
-        public string VTitle { get => viewport.Title; set => viewport.Title = value; }
-        public nint VIcon { get => viewport.Icon; set => viewport.Icon = value; }
-        public bool VResizable { get => viewport.Resizable; set => viewport.Resizable = value; }
-        public bool ShouldClose => viewport.ShouldClose;
-        public string ClipboardContent
+    }
+    public IKeyboard Keyboard => keyboard;
+    public IMouse Mouse => mouse;
+    public INativeAPILoader APILoader => apiLoader;
+    #endregion
+
+    private delegate bool wglSwapIntervalEXT(int interval);
+
+    public void Init()
+    {
+        try
         {
-            get
-            {
-                if (!OpenClipboard(NULLPTR))
-                    return "";
-                nint handle = GetClipboardData(CF_TEXT);
-                string data = Marshal.PtrToStringAnsi(handle);
-                CloseClipboard();
-                return data ?? "";
-            }
-            set
-            {
-                if (!OpenClipboard(NULLPTR))
-                    return;
-                nint handle = Marshal.StringToHGlobalAnsi(value);
-                SetClipboardData(CF_TEXT, handle);
-                Marshal.FreeHGlobal(handle);
-                CloseClipboard();
-            }
-        }
-        #endregion
+            glLib = W32Libraries.LoadLibraryA(GL_LIBRARY);
+            alLib = W32Libraries.LoadLibraryA(AL_LIBRARY);
 
-        private delegate bool wglSwapIntervalEXT(int interval);
+            apiLoader = new W32NativeAPILoader(glLib, alLib);
+            viewport = new W32Viewport();
+            keyboard = new W32Keyboard();
+            mouse = new W32Mouse();
 
-        public void Init()
-        {
-            try
-            {
-                glLib = W32Libraries.LoadLibraryA(GL_LIBRARY);
-                glLookup = new W32GLLookup(glLib);
-                apiLoader = new GLAPILoader(glLookup);
-
-                viewport = new W32Viewport();
-                viewport.SetupGLContext(glLookup);
-
-                if (!viewport.HasGLContext)
-                    throw new GLException("Viewport has no GL context");
-                apiLoader.Load();
-
-                // XXX: If this is NULL, V-sync isn't implemented?
-                glLookup.Lookup<wglSwapIntervalEXT>(true)?.Invoke(0);
-            }
-            catch
-            {
-                Dispose();
-                throw;
-            }
-        }
-
-        public IKeyboard GetKeyboard()
-        {
-            W32Keyboard keyboard = new W32Keyboard();
+            viewport.SetupGLContext(apiLoader);
             keyboard.Init(viewport);
-            return keyboard;
-        }
-
-        public IMouse GetMouse()
-        {
-            W32Mouse mouse = new W32Mouse();
             mouse.Init(viewport);
-            return mouse;
+
+            if (!viewport.HasGLContext)
+                throw new GLException("Viewport has no GL context");
+
+            // XXX: If this is NULL, V-sync isn't implemented?
+            apiLoader.LoadDelegateGL<wglSwapIntervalEXT>("wglSwapIntervalEXT")?.Invoke(0);
         }
-
-        public void Center() => viewport.Center();
-
-        public void Flush() => viewport.Swap();
-
-        public void Poll() => viewport.Poll();
-
-        public void Dispose()
+        catch
         {
-            viewport?.Dispose();
-            apiLoader?.Unload();
-
-            try
-            {
-                if (glLib != NULLPTR)
-                    W32Libraries.FreeLibrary(glLib);
-            }
-            catch { }
-
-            glLib = NULLPTR;
-            glLookup = null;
-            viewport = null;
+            Dispose();
+            throw;
         }
+    }
+
+    public void Center() => viewport.Center();
+
+    public void Flush() => viewport.Swap();
+
+    public void Poll() => viewport.Poll();
+
+    public void Dispose()
+    {
+        viewport?.Dispose();
+
+        try
+        {
+            if (glLib != NULLPTR)
+                W32Libraries.FreeLibrary(glLib);
+            if (alLib != NULLPTR)
+                W32Libraries.FreeLibrary(alLib);
+        }
+        catch { }
+
+        glLib = NULLPTR;
+        alLib = NULLPTR;
+        apiLoader = null;
+
+        mouse = null;
+        keyboard = null;
+        viewport = null;
     }
 }

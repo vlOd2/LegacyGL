@@ -3,12 +3,11 @@
 
 using System;
 
-namespace LegacyGL
-{
-    public class GLException : Exception
-    {
-        public GLException(string msg) : base(msg) { }
+namespace LegacyGL;
 
-        public GLException(string msg, Exception inner) : base(msg, inner) { }
-    }
+public class GLException : Exception
+{
+    public GLException(string msg) : base(msg) { }
+
+    public GLException(string msg, Exception inner) : base(msg, inner) { }
 }

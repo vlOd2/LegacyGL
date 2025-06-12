@@ -1,59 +1,58 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace XLibSharp
+namespace XLibSharp;
+
+public enum XScreenSaverExposures: int
 {
-    public enum XScreenSaverExposures: int
-    {
-        DontAllowExposures = 0,
-        AllowExposures = 1,
-        DefaultExposures = 2,
-    }
+    DontAllowExposures = 0,
+    AllowExposures = 1,
+    DefaultExposures = 2,
+}
 
-    public enum XScreenSaverMode: int
-    {
-        ScreenSaverReset = 0,
-        ScreenSaverActive = 1,
-    }
+public enum XScreenSaverMode: int
+{
+    ScreenSaverReset = 0,
+    ScreenSaverActive = 1,
+}
 
-    public enum XScreenSaverBlanking: int
-    {
-        DontPreferBlanking = 0,
-        PreferBlanking = 1,
-        DefaultBlanking = 2,
-    }
-    
-    [StructLayout(LayoutKind.Sequential)]
-    public struct XScreenSaverInfo
-    {
-        public XWindow window;
-        public int state;
-        public int kind;
-        public ulong til_or_since;
-        public ulong idle;
-        public ulong eventMask;
-    }
+public enum XScreenSaverBlanking: int
+{
+    DontPreferBlanking = 0,
+    PreferBlanking = 1,
+    DefaultBlanking = 2,
+}
 
-    public partial class XLib
-    {
-        [DllImport("libX11.so.6")]
-        public static extern XStatus XSetScreenSaver(XDisplay display, int timeout, int interval, XScreenSaverBlanking prefer_blanking, 
-            XScreenSaverExposures allow_exposures);
+[StructLayout(LayoutKind.Sequential)]
+public struct XScreenSaverInfo
+{
+    public XWindow window;
+    public int state;
+    public int kind;
+    public ulong til_or_since;
+    public ulong idle;
+    public ulong eventMask;
+}
 
-        [DllImport("libX11.so.6")]
-        public static extern XStatus XForceScreenSaver(XDisplay display, XScreenSaverMode mode);
+public partial class XLib
+{
+    [DllImport("libX11.so.6")]
+    public static extern XStatus XSetScreenSaver(XDisplay display, int timeout, int interval, XScreenSaverBlanking prefer_blanking, 
+        XScreenSaverExposures allow_exposures);
 
-        [DllImport("libX11.so.6")]
-        public static extern XStatus XActivateScreenSaver(XDisplay display);
+    [DllImport("libX11.so.6")]
+    public static extern XStatus XForceScreenSaver(XDisplay display, XScreenSaverMode mode);
 
-        [DllImport("libX11.so.6")]
-        public static extern XStatus XResetScreenSaver(XDisplay display);
+    [DllImport("libX11.so.6")]
+    public static extern XStatus XActivateScreenSaver(XDisplay display);
 
-        [DllImport("libX11.so.6")]
-        public static extern XStatus XGetScreenSaver(XDisplay display, ref int timeout_return, ref int interval_return, 
-            ref XScreenSaverBlanking prefer_blanking_return, ref XScreenSaverExposures allow_exposures_return);
+    [DllImport("libX11.so.6")]
+    public static extern XStatus XResetScreenSaver(XDisplay display);
 
-        [DllImport("libXss.so.1")]
-        public static extern XStatus XScreenSaverQueryInfo(XDisplay display, XWindow drawable, ref XScreenSaverInfo saver_info);
-    }
+    [DllImport("libX11.so.6")]
+    public static extern XStatus XGetScreenSaver(XDisplay display, ref int timeout_return, ref int interval_return, 
+        ref XScreenSaverBlanking prefer_blanking_return, ref XScreenSaverExposures allow_exposures_return);
+
+    [DllImport("libXss.so.1")]
+    public static extern XStatus XScreenSaverQueryInfo(XDisplay display, XWindow drawable, ref XScreenSaverInfo saver_info);
 }

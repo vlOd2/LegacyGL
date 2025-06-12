@@ -4,30 +4,29 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace LegacyGL.Internal
+namespace LegacyGL.Internal;
+
+internal static class Utils
 {
-    internal static class Utils
-    {
-        private static readonly DateTime TIME_EPOCH = new DateTime(1970, 1, 1);
+    private static readonly DateTime TIME_EPOCH = new DateTime(1970, 1, 1);
 
-        //public static bool IsRawInputAvailable()
-        //{
-        //    Version osVer = Environment.OSVersion.Version;
-        //    if (osVer.Major < 5 || (osVer.Major == 5 && osVer.Minor < 1))
-        //        return false;
+    //public static bool IsRawInputAvailable()
+    //{
+    //    Version osVer = Environment.OSVersion.Version;
+    //    if (osVer.Major < 5 || (osVer.Major == 5 && osVer.Minor < 1))
+    //        return false;
 
-        //    nint u32Lib = W32Libraries.GetModuleHandle("user32.dll");
-        //    if (u32Lib == NULLPTR)
-        //        return false;
+    //    nint u32Lib = W32Libraries.GetModuleHandle("user32.dll");
+    //    if (u32Lib == NULLPTR)
+    //        return false;
 
-        //    nint getRawInputData = W32Libraries.GetProcAddress(u32Lib, "GetRawInputData");
-        //    nint registerRawInputDevices = W32Libraries.GetProcAddress(u32Lib, "RegisterRawInputDevices");
-        //    nint getRawInputDeviceList = W32Libraries.GetProcAddress(u32Lib, "GetRawInputDeviceList");
-        //    return getRawInputData != NULLPTR &&
-        //        registerRawInputDevices != NULLPTR &&
-        //        getRawInputDeviceList != NULLPTR;
-        //}
+    //    nint getRawInputData = W32Libraries.GetProcAddress(u32Lib, "GetRawInputData");
+    //    nint registerRawInputDevices = W32Libraries.GetProcAddress(u32Lib, "RegisterRawInputDevices");
+    //    nint getRawInputDeviceList = W32Libraries.GetProcAddress(u32Lib, "GetRawInputDeviceList");
+    //    return getRawInputData != NULLPTR &&
+    //        registerRawInputDevices != NULLPTR &&
+    //        getRawInputDeviceList != NULLPTR;
+    //}
 
-        public static long UnixMillis => (long)(DateTime.UtcNow - TIME_EPOCH).TotalMilliseconds;
-    }
+    public static long UnixMillis => (long)(DateTime.UtcNow - TIME_EPOCH).TotalMilliseconds;
 }

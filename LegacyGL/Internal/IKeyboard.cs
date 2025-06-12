@@ -3,13 +3,12 @@
 
 using System;
 
-namespace LegacyGL.Internal
+namespace LegacyGL.Internal;
+
+internal interface IKeyboard : IDisposable
 {
-    internal interface IKeyboard : IDisposable
-    {
-        bool AllowRepeatEvents { get; set; }
-        void Poll();
-        bool Next(out InputEvent @event);
-        bool GetKeyState(int vk);
-    }
+    bool AllowRepeatEvents { get; set; }
+    void Poll();
+    bool Next(out InputEvent e);
+    bool GetKeyState(int vk);
 }

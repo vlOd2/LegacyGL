@@ -4,30 +4,19 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace LegacyGL.Internal.Win32Impl.Native
+namespace LegacyGL.Internal.Win32Impl.Native;
+
+internal static class Win32
 {
-    internal static class Win32
-    {
-        public static readonly nint NULLPTR = nint.Zero;
-        public const int CW_USEDEFAULT = unchecked((int)0x80000000);
+    public static readonly nint NULLPTR = nint.Zero;
+    public const int CW_USEDEFAULT = unchecked((int)0x80000000);
 
-        [DllImport("user32.dll")]
-        public static extern int GetSystemMetrics(int nIndex);
+    [DllImport("user32.dll")]
+    public static extern int GetSystemMetrics(int nIndex);
 
-        public static short SizeOf<T>(T? obj = null) where T : struct
-        {
-            int size = obj != null ? Marshal.SizeOf(obj) : Marshal.SizeOf(typeof(T));
-            return (short)size;
-        }
+    public static short SizeOf<T>(T? obj = null) where T : struct => (short)(obj != null ? Marshal.SizeOf(obj) : Marshal.SizeOf(typeof(T)));
 
-        public static short GET_X_LPARAM(int lparam)
-        {
-            return (short)(lparam & 0xFFFF);
-        }
+    public static short GET_X_LPARAM(int lparam) => (short)(lparam & 0xFFFF);
 
-        public static short GET_Y_LPARAM(int lparam)
-        {
-            return (short)((lparam >> 16) & 0xFFFF);
-        }
-    }
+    public static short GET_Y_LPARAM(int lparam) => (short)((lparam >> 16) & 0xFFFF);
 }

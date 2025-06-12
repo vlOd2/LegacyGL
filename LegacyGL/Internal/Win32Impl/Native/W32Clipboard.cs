@@ -4,24 +4,23 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace LegacyGL.Internal.Win32Impl.Native
+namespace LegacyGL.Internal.Win32Impl.Native;
+
+internal static class W32Clipboard
 {
-    internal static class W32Clipboard
-    {
-        public const int CF_TEXT = 1;
+    public const int CF_TEXT = 1;
 
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool OpenClipboard(nint hWndNewOwner);
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool OpenClipboard(nint hWndNewOwner);
 
-        [DllImport("user32.dll")]
-        public static extern nint GetClipboardData(uint uFormat);
+    [DllImport("user32.dll")]
+    public static extern nint GetClipboardData(uint uFormat);
 
-        [DllImport("user32.dll")]
-        public static extern nint SetClipboardData(int uFormat, nint hMem);
+    [DllImport("user32.dll")]
+    public static extern nint SetClipboardData(int uFormat, nint hMem);
 
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool CloseClipboard();
-    }
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool CloseClipboard();
 }
