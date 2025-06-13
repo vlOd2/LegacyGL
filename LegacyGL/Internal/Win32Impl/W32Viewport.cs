@@ -1,5 +1,5 @@
 ﻿// Copyright (c) vlOd
-// Licensed under the GNU Affero General Public License, version 3.0
+// Licensed under the GNU Lesser General Public License, version 3.0
 
 using System.Collections.Concurrent;
 using System.Drawing;
@@ -25,7 +25,6 @@ using static LegacyGL.Internal.Win32Impl.Native.W32WGL;
 using static LegacyGL.Internal.Win32Impl.Native.W32Windowing;
 using static LegacyGL.Internal.Win32Impl.Native.Win32;
 using LegacyGL.Bindings;
-using System.Runtime.CompilerServices;
 
 namespace LegacyGL.Internal.Win32Impl;
 
@@ -43,15 +42,13 @@ internal unsafe class W32Viewport : IDisposable
     public readonly ConcurrentQueue<W32KBEvent> KeyboardEvents = [];
     public bool CursorHidden;
     public short ScrollWheel;
-    private RECT windowRect;
-    private RECT clientRect;
+    public RECT WindowRect;
+    public RECT ClientRect;
     #region Properties
     private int windowStyles => GetWindowLongA(Handle, GWL_STYLE);
-    public Point Position => new(windowRect.left, windowRect.top);
-    public Size Size => new(windowRect.right - windowRect.left, windowRect.bottom - windowRect.top);
     public Size ClientSize
     {
-        get => new(clientRect.right, clientRect.bottom);
+        get => new(ClientRect.right, ClientRect.bottom);
         set
         {
             RECT rect = new()
@@ -62,8 +59,8 @@ internal unsafe class W32Viewport : IDisposable
             AdjustWindowRect(ref rect, windowStyles, false);
             int w = rect.right - rect.left;
             int h = rect.bottom - rect.top;
-            clientRect.right = w;
-            clientRect.bottom = h;
+            ClientRect.right = w;
+            ClientRect.bottom = h;
             SetWindowPos(Handle, 0, 0, 0, w, h, SWP_NOZORDER | SWP_NOMOVE);
         }
     }
@@ -141,14 +138,15 @@ internal unsafe class W32Viewport : IDisposable
             return false;
         }
 
+        UpdateRects();
         deviceContext = GetDC(Handle);
+
         if (deviceContext == 0)
         {
             Dispose();
             LGL.ErrorLogHandler("Could not create device context");
             return false;
         }
-        UpdateRects();
 
         return true;
     }
@@ -277,18 +275,18 @@ internal unsafe class W32Viewport : IDisposable
 
     private void UpdateRects()
     {
-        windowRect = new();
-        clientRect = new();
-        GetWindowRect(Handle, ref windowRect);
-        GetClientRect(Handle, ref clientRect);
+        WindowRect = new();
+        ClientRect = new();
+        GetWindowRect(Handle, ref WindowRect);
+        GetClientRect(Handle, ref ClientRect);
     }
 
     public void Center()
     {
         int sw = GetSystemMetrics(W32ConstSM.SM_CXSCREEN);
         int sh = GetSystemMetrics(W32ConstSM.SM_CYSCREEN);
-        int w = windowRect.right - windowRect.left;
-        int h = windowRect.bottom - windowRect.top;
+        int w = WindowRect.right - WindowRect.left;
+        int h = WindowRect.bottom - WindowRect.top;
         int x = sw / 2 - w / 2;
         int y = sh / 2 - h / 2;
         SetWindowPos(Handle, 0, x, y, w, h, SWP_NOZORDER | SWP_NOSIZE);
@@ -388,15 +386,15 @@ internal unsafe class W32Viewport : IDisposable
 
                     if (isMove)
                     {
-                        windowRect.left = ptr->x;
-                        windowRect.top = ptr->y;
+                        WindowRect.left = ptr->x;
+                        WindowRect.top = ptr->y;
                     }
 
                     if (isResize)
                     {
-                        windowRect.right = ptr->w + ptr->x;
-                        windowRect.bottom = ptr->h + ptr->y;
-                        GetClientRect(Handle, ref clientRect);
+                        WindowRect.right = ptr->w + ptr->x;
+                        WindowRect.bottom = ptr->h + ptr->y;
+                        GetClientRect(Handle, ref ClientRect);
                     }
 
                     break;

@@ -1,4 +1,7 @@
-﻿using LegacyGL.Bindings;
+﻿// Copyright (c) vlOd
+// Licensed under the GNU Lesser General Public License, version 3.0
+
+using LegacyGL.Bindings;
 using LegacyGL.Internal.Abstract;
 using System.Reflection;
 

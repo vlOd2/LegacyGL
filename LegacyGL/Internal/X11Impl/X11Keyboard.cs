@@ -1,5 +1,5 @@
 // Copyright (c) vlOd
-// Licensed under the GNU Affero General Public License, version 3.0
+// Licensed under the GNU Lesser General Public License, version 3.0
 
 using LegacyGL.Internal.Abstract;
 
@@ -27,4 +27,6 @@ internal class X11Keyboard : IKeyboard
     public void Dispose()
     {
     }
+
+    public string GetFriendlyName(int vk) => "";
 }

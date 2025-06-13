@@ -1,7 +1,6 @@
 // Copyright (c) vlOd
-// Licensed under the GNU Affero General Public License, version 3.0
+// Licensed under the GNU Lesser General Public License, version 3.0
 
-using System.Drawing;
 using System.Runtime.InteropServices;
 using XLibSharp;
 using static XLibSharp.XLib;
@@ -9,7 +8,7 @@ using static XLibSharp.GLX;
 
 namespace LegacyGL.Internal.X11Impl;
 
-public class X11Viewport : IDisposable
+internal class X11Viewport : IDisposable
 {
     private static readonly int[] GLX_ATTRIBS = { GLX_RGBA, GLX_DEPTH_SIZE, 24, GLX_DOUBLEBUFFER, 0 };
     private nint display;

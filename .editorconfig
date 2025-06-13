@@ -3,4 +3,4 @@ root = true
 
 # C# files
 [*.cs]
-file_header_template = Copyright (c) vlOd\nLicensed under the GNU Affero General Public License, version 3.0
+file_header_template = Copyright (c) vlOd\nLicensed under the GNU Lesser General Public License, version 3.0

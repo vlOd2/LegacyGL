@@ -1,5 +1,5 @@
 ﻿// Copyright (c) vlOd
-// Licensed under the GNU Affero General Public License, version 3.0
+// Licensed under the GNU Lesser General Public License, version 3.0
 
 namespace LegacyGL;
 
@@ -7,6 +7,38 @@ namespace LegacyGL;
 // TODO: Add all characters, as only special ones are here
 public static class VKs
 {
+    internal static readonly Dictionary<int, string> KEY_NAMES = new()
+    {
+        { VK_SPACE, "SPACE" },
+        { VK_RETURN, "RETURN" },
+        { VK_BACK, "BACKSPACE" },
+        { VK_TAB, "TAB" },
+        { VK_ESCAPE, "ESC" },
+        { VK_LSHIFT, "LSHIFT" },
+        { VK_RSHIFT, "RSHIFT" },
+        { VK_LCONTROL, "LCTRL" },
+        { VK_RCONTROL, "RCTRL" },
+        { VK_LMENU, "LALT" },
+        { VK_RMENU, "RALT" },
+        { VK_LWIN, "LSUPER" },
+        { VK_RWIN, "RSUPER" },
+        { VK_CAPITAL, "CAPS LOCK" },
+        { VK_SCROLL, "SCROLL LOCK" },
+        { VK_NUMLOCK, "NUM LOCK" },
+        { VK_PRINT, "PRINT SCR" },
+        { VK_PAUSE, "PAUSE" },
+        { VK_INSERT, "INSERT" },
+        { VK_DELETE, "DELETE" },
+        { VK_HOME, "HOME" },
+        { VK_END, "END" },
+        { VK_PRIOR, "PAGE UP" },
+        { VK_NEXT, "PAGE DOWN" },
+        { VK_UP, "UP" },
+        { VK_DOWN, "DOWN" },
+        { VK_LEFT, "LEFT" },
+        { VK_RIGHT, "RIGHT" }
+    };
+
     public const int VK_LAUNCH_MEDIA_SELECT = 181;
     public const int VK_BROWSER_FAVORITES = 171;
     public const int VK_MEDIA_PREV_TRACK = 177;

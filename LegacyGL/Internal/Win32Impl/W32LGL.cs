@@ -1,12 +1,11 @@
 ﻿// Copyright (c) vlOd
-// Licensed under the GNU Affero General Public License, version 3.0
+// Licensed under the GNU Lesser General Public License, version 3.0
 
 using LegacyGL.Internal.Abstract;
 using LegacyGL.Internal.Win32Impl.Native;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using static LegacyGL.Internal.Win32Impl.Native.W32Clipboard;
-using static LegacyGL.Internal.Win32Impl.Native.Win32;
 
 namespace LegacyGL.Internal.Win32Impl;
 

@@ -1,4 +1,7 @@
-﻿namespace LegacyGL.Internal;
+﻿// Copyright (c) vlOd
+// Licensed under the GNU Lesser General Public License, version 3.0
+
+namespace LegacyGL.Internal;
 
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
 internal class GLFeature : Attribute

@@ -1,5 +1,5 @@
 // Copyright (c) vlOd
-// Licensed under the GNU Affero General Public License, version 3.0
+// Licensed under the GNU Lesser General Public License, version 3.0
 
 using System.Drawing;
 using LegacyGL;
@@ -15,7 +15,7 @@ internal class X11Mouse : IMouse
     public bool LeftButton { get; }
     public bool MiddleButton { get; }
     public bool RightButton { get; }
-    public float ScrollWheel { get; }
+    public int ScrollWheel { get; }
 
     public void Poll()
     {

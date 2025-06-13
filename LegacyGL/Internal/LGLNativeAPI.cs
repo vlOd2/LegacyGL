@@ -1,4 +1,7 @@
-﻿using System.Reflection;
+﻿// Copyright (c) vlOd
+// Licensed under the GNU Lesser General Public License, version 3.0
+
+using System.Reflection;
 
 namespace LegacyGL.Internal;
 

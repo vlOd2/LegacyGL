@@ -1,9 +1,8 @@
 ﻿// Copyright (c) vlOd
-// Licensed under the GNU Affero General Public License, version 3.0
+// Licensed under the GNU Lesser General Public License, version 3.0
 
 using LegacyGL.Internal.Abstract;
 using LegacyGL.Internal.Win32Impl.Native.Structs;
-using System.Collections.Generic;
 using System.Drawing;
 using static LegacyGL.Internal.Win32Impl.Native.W32Input;
 using static LegacyGL.Internal.Win32Impl.Native.W32Windowing;
@@ -20,6 +19,7 @@ internal class W32Mouse : IMouse
     private Point lastPos = new Point(-9999, -9999);
     private readonly bool[] buttonStates = new bool[3];
     private readonly Queue<InputEvent> events = [];
+    #region Properties
     public bool Captured { get => viewport.CursorHidden; set => viewport.CursorHidden = value; }
     public Point Position
     {
@@ -38,15 +38,16 @@ internal class W32Mouse : IMouse
     public bool LeftButton => buttonStates[BTN_LEFT];
     public bool RightButton => buttonStates[BTN_RIGHT];
     public bool MiddleButton => buttonStates[BTN_MIDDLE];
-    public float ScrollWheel
+    public int ScrollWheel
     {
         get
         {
-            float wheel = viewport.ScrollWheel;
+            int wheel = viewport.ScrollWheel;
             viewport.ScrollWheel = 0;
             return wheel;
         }
     }
+    #endregion
 
     public void Init(W32Viewport viewport)
     {
@@ -70,8 +71,8 @@ internal class W32Mouse : IMouse
 
         if (Captured)
         {
-            int cx = viewport.Position.X + viewport.Size.Width / 2;
-            int cy = viewport.Position.Y + viewport.Size.Height / 2;
+            int cx = viewport.WindowRect.right / 2;
+            int cy = viewport.WindowRect.bottom / 2;
             lastPos = new Point(cx, cy);
             SetCursorPos(cx, cy);
         }
@@ -80,14 +81,13 @@ internal class W32Mouse : IMouse
     }
 
     private void EnqueueButtonEvent(int vk, bool state)
-    {
-        InputEvent inputEvent = new InputEvent();
-        inputEvent.VK = vk;
-        inputEvent.State = state;
-        inputEvent.Millis = Utils.UnixMillis;
-        inputEvent.Filled = true;
-        events.Enqueue(inputEvent);
-    }
+        => events.Enqueue(new()
+        {
+            VK = vk,
+            State = state,
+            Millis = Utils.UnixMillis,
+            Filled = true
+        });
 
     private void PollButtons()
     {
@@ -120,14 +120,11 @@ internal class W32Mouse : IMouse
         if (!viewport.Focused)
             return;
 
-        RECT wndRect = new();
-        GetWindowRect(viewport.Handle, ref wndRect);
-
         POINT curPos = new();
         GetCursorPos(ref curPos);
 
-        if (curPos.x < wndRect.left || curPos.y < wndRect.top ||
-            curPos.x > wndRect.right || curPos.y > wndRect.bottom)
+        if (curPos.x < viewport.WindowRect.left || curPos.y < viewport.WindowRect.top ||
+            curPos.x > viewport.WindowRect.right || curPos.y > viewport.WindowRect.bottom)
             return;
 
         PollPosition(curPos);

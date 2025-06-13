@@ -1,5 +1,5 @@
 ﻿// Copyright (c) vlOd
-// Licensed under the GNU Affero General Public License, version 3.0
+// Licensed under the GNU Lesser General Public License, version 3.0
 
 using LegacyGL.Internal.Abstract;
 using static LegacyGL.Internal.Win32Impl.Native.W32Input;
@@ -9,7 +9,7 @@ namespace LegacyGL.Internal.Win32Impl;
 internal class W32Keyboard : IKeyboard
 {
     private W32Viewport viewport;
-    private bool[] keyStates = new bool[256];
+    private byte[] kbState = new byte[256];
     private readonly Queue<InputEvent> events = [];
     public bool AllowRepeatEvents { get; set; }
 
@@ -40,11 +40,7 @@ internal class W32Keyboard : IKeyboard
 
     public void Poll()
     {
-        byte[] kbState = new byte[256];
         GetKeyboardState(kbState);
-
-        for (int i = 0; i < kbState.Length; i++)
-            keyStates[i] = (kbState[i] & 0x80) != 0;
 
         while (viewport.KeyboardEvents.TryDequeue(out W32KBEvent kbEvent))
         {
@@ -74,10 +70,20 @@ internal class W32Keyboard : IKeyboard
         return true;
     }
 
-    public bool GetKeyState(int vk) => keyStates[vk];
+    public bool GetKeyState(int vk) => (kbState[vk] & 0x80) != 0;
 
     public void Dispose()
     {
         viewport = null;
+    }
+
+    public string GetFriendlyName(int vk)
+    {
+        if (VKs.KEY_NAMES.TryGetValue(vk, out string data))
+            return data;
+        char c = TranslateVK((short)vk, 0, kbState);
+        if (c == '\0')
+            return $"UNK {vk}";
+        return "" + c;
     }
 }

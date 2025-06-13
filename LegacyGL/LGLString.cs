@@ -1,5 +1,5 @@
 // Copyright (c) vlOd
-// Licensed under the GNU Affero General Public License, version 3.0
+// Licensed under the GNU Lesser General Public License, version 3.0
 
 using System.Runtime.InteropServices;
 using System.Text;

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) vlOd
-// Licensed under the GNU Affero General Public License, version 3.0
+// Licensed under the GNU Lesser General Public License, version 3.0
 
-using System;
 using System.Drawing;
 
 namespace LegacyGL.Internal.Abstract;
@@ -14,7 +13,7 @@ internal interface IMouse : IDisposable
     bool LeftButton { get; }
     bool MiddleButton { get; }
     bool RightButton { get; }
-    float ScrollWheel { get; }
+    int ScrollWheel { get; }
     void Poll();
     bool Next(out InputEvent e);
 }

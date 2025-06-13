@@ -1,9 +1,8 @@
 ﻿// Copyright (c) vlOd
-// Licensed under the GNU Affero General Public License, version 3.0
+// Licensed under the GNU Lesser General Public License, version 3.0
 
 using LegacyGL.Internal.Abstract;
 using LegacyGL.Internal.Win32Impl.Native;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace LegacyGL.Internal.Win32Impl;

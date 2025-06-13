@@ -1,16 +1,18 @@
 ﻿// Copyright (c) vlOd
-// Licensed under the GNU Affero General Public License, version 3.0
+// Licensed under the GNU Lesser General Public License, version 3.0
 
 using LegacyGL.Internal;
 using LegacyGL.Internal.Abstract;
 using LegacyGL.Internal.Win32Impl;
 using LegacyGL.Internal.X11Impl;
-using System.Data.SqlTypes;
 using System.Drawing;
 using System.Text.RegularExpressions;
 
 namespace LegacyGL;
 
+/// <summary>
+/// Manages the GL context and viewport
+/// </summary>
 public static partial class LGL
 {
     internal const int DEFAULT_WIDTH = 800;
