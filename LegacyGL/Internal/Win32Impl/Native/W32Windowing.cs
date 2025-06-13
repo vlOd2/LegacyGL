@@ -75,11 +75,14 @@ internal static class W32Windowing
 
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool ScreenToClient(nint hWnd, ref Point lpPoint);
+    public static extern bool ScreenToClient(nint hWnd, ref POINT lpPoint);
+
+    [DllImport("user32.dll")]
+    public static extern int MapWindowPoints(nint hWndFrom, nint hWndTo, ref Point lpPoints, int cPoints);
 
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool ClientToScreen(nint hWnd, ref Point lpPoint);
+    public static extern bool ClientToScreen(nint hWnd, ref POINT lpPoint);
 
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]

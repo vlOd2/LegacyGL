@@ -12,5 +12,13 @@ internal struct POINT
     public int x;
     public int y;
 
-    public static implicit operator Point(POINT point) => new Point(point.x, point.y);
+    public POINT(int x, int y) 
+    {
+        this.x = x;
+        this.y = y;
+    }
+
+    public static implicit operator Point(POINT point) => new(point.x, point.y);
+
+    public static implicit operator POINT(Point point) => new(point.X, point.Y);
 }

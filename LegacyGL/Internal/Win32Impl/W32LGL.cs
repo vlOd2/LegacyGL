@@ -21,20 +21,16 @@ internal unsafe class W32LGL : ILGL
     internal W32Mouse mouse;
     internal W32NativeAPILoader apiLoader;
     #region Properties
-    public int VWidth
+    public Size Size
     {
-        get => viewport.ClientSize.Width;
-        set => viewport.ClientSize = new Size(value, VHeight);
+        get => viewport.ClientSize;
+        set => viewport.ClientSize = value;
     }
-    public int VHeight
-    {
-        get => viewport.ClientSize.Height;
-        set => viewport.ClientSize = new Size(VWidth, value);
-    }
-    public string VTitle { get => viewport.Title; set => viewport.Title = value; }
-    public nint VIcon { get => viewport.Icon; set => viewport.Icon = value; }
-    public bool VResizable { get => viewport.Resizable; set => viewport.Resizable = value; }
+    public string Title { get => viewport.Title; set => viewport.Title = value; }
+    public nint Icon { get => viewport.Icon; set => viewport.Icon = value; }
+    public bool Resizable { get => viewport.Resizable; set => viewport.Resizable = value; }
     public bool ShouldClose => viewport.ShouldClose;
+    public bool Focused => viewport.Focused;
     public string ClipboardContent
     {
         get

@@ -13,10 +13,9 @@ public static class Program
 
         ContextRequest ctxReq = new();
         LGL.Init(ref ctxReq);
-        LGL.VWidth = w;
-        LGL.VHeight = h;
-        LGL.VTitle = "Example Game";
-        LGL.VResizable = true;
+        LGL.Size = new System.Drawing.Size(w, h);
+        LGL.Title = "Example Game";
+        LGL.Resizable = true;
         LGL.Center();
 
         glClearColor(1.0F, 0.0F, 0.0F, 1.0F);
@@ -35,10 +34,11 @@ public static class Program
             glVertex2f(0F, 0.5F);
             glEnd();
 
-            if (LGL.VWidth != w || LGL.VHeight != h)
+            System.Drawing.Size size = LGL.Size;
+            if (size.Width != w || size.Height != h)
             {
-                w = LGL.VWidth;
-                h = LGL.VHeight;
+                w = size.Width;
+                h = size.Height;
                 glViewport(0, 0, w, h);
             }
 

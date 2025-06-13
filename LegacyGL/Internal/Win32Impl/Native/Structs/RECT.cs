@@ -14,5 +14,15 @@ internal struct RECT
     public int right;
     public int bottom;
 
+    public RECT(int l, int t, int r, int b)
+    {
+        left = l;
+        top = t;
+        right = r;
+        bottom = b;
+    }
+
     public static implicit operator Rectangle(RECT rect) => Rectangle.FromLTRB(rect.left, rect.top, rect.right, rect.bottom);
+
+    public static implicit operator RECT(Rectangle rect) => new(rect.Left, rect.Top, rect.Right, rect.Bottom);
 }

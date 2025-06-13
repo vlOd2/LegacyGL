@@ -7,6 +7,6 @@
     <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\XLibSharp\XLibSharp\XLibSharp.csproj" />
+    <ProjectReference Include="..\XLibSharp\XLibSharp.csproj" />
   </ItemGroup>
 </Project>

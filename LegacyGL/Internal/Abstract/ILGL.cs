@@ -1,16 +1,18 @@
 ﻿// Copyright (c) vlOd
 // Licensed under the GNU Affero General Public License, version 3.0
 
+using System.Drawing;
+
 namespace LegacyGL.Internal.Abstract;
 
 internal interface ILGL : IDisposable
 {
-    int VWidth { get; set; }
-    int VHeight { get; set; }
-    string VTitle { get; set; }
-    nint VIcon { get; set; }
-    bool VResizable { get; set; }
+    Size Size { get; set; }
+    string Title { get; set; }
+    nint Icon { get; set; }
+    bool Resizable { get; set; }
     bool ShouldClose { get; }
+    bool Focused { get; }
     string ClipboardContent { get; set; }
     IKeyboard Keyboard { get; }
     IMouse Mouse { get; }

@@ -1,7 +1,7 @@
 ﻿// Copyright (c) vlOd
 // Licensed under the GNU Affero General Public License, version 3.0
 
-using System.Drawing;
+using LegacyGL.Internal.Win32Impl.Native.Structs;
 using System.Runtime.InteropServices;
 
 namespace LegacyGL.Internal.Win32Impl.Native;
@@ -10,7 +10,7 @@ internal static class W32Input
 {
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool GetCursorPos(ref Point lpPoint);
+    public static extern bool GetCursorPos(ref POINT lpPoint);
 
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]

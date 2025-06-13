@@ -6,6 +6,7 @@ using LegacyGL.Internal.Abstract;
 using LegacyGL.Internal.Win32Impl;
 using LegacyGL.Internal.X11Impl;
 using System.Data.SqlTypes;
+using System.Drawing;
 using System.Text.RegularExpressions;
 
 namespace LegacyGL;
@@ -19,52 +20,50 @@ public static partial class LGL
     /// Handler for detailed error information<br/>
     /// Default implementation prints everything to stderr
     /// </summary>
-    public static Action<string> ErrorLogHandler = (s) => Console.Error.WriteLine($"[LegacyGL] {s}"); 
+    public static Action<string> ErrorLogHandler = (s) => Console.Error.WriteLine($"[LegacyGL] {s}");
+    [GeneratedRegex(@"(\d)\.(\d)(?:\.\d)?(?= )")]
+    private static partial Regex GLVersionRegex();
     #region Properties
     /// <summary>
-    /// The width of the viewport
+    /// The size of the viewport
     /// </summary>
-    public static int VWidth
+    public static Size Size
     {
-        get => GetPropSafe(instance.VWidth);
-        set => EnsureLoaded(() => instance.VWidth = value);
-    }
-    /// <summary>
-    /// The height of the viewport
-    /// </summary>
-    public static int VHeight
-    {
-        get => GetPropSafe(instance.VHeight);
-        set => EnsureLoaded(() => instance.VHeight = value);
+        get => GetPropSafe(instance.Size);
+        set => EnsureLoaded(() => instance.Size = value);
     }
     /// <summary>
     /// The title of the viewport
     /// </summary>
-    public static string VTitle
+    public static string Title
     {
-        get => GetPropSafe(instance.VTitle);
-        set => EnsureLoaded(() => instance.VTitle = value);
+        get => GetPropSafe(instance.Title);
+        set => EnsureLoaded(() => instance.Title = value);
     }
     /// <summary>
     /// The icon of the viewport
     /// </summary>
-    public static nint VIcon
+    public static nint Icon
     {
-        get => GetPropSafe(instance.VIcon);
-        set => EnsureLoaded(() => instance.VIcon = value);
+        get => GetPropSafe(instance.Icon);
+        set => EnsureLoaded(() => instance.Icon = value);
     }
     /// <summary>
     /// If the viewport can be resized by the user
     /// </summary>
-    public static bool VResizable
+    public static bool Resizable
     {
-        get => GetPropSafe(instance.VResizable);
-        set => EnsureLoaded(() => instance.VResizable = value);
+        get => GetPropSafe(instance.Resizable);
+        set => EnsureLoaded(() => instance.Resizable = value);
     }
     /// <summary>
     /// If the viewport has been requested to close
     /// </summary>
-    public static bool ShouldClose => instance.ShouldClose;
+    public static bool ShouldClose => GetPropSafe(instance.ShouldClose);
+    /// <summary>
+    /// If the viewport is currently focused
+    /// </summary>
+    public static bool Focused => GetPropSafe(instance.Focused);
     /// <summary>
     /// The system text clipboard
     /// </summary>
@@ -78,19 +77,6 @@ public static partial class LGL
     /// </summary>
     public static bool IsALAvailable => ALLoader.Loaded;
     #endregion
-
-    [GeneratedRegex(@"(\d)\.(\d)(?:\.\d)?(?= )")]
-    private static partial Regex GLVersionRegex();
-
-    internal static (int, int) ParseGLVersion(string str)
-    {
-        Match match = GLVersionRegex().Match(str);
-        if (!match.Success)
-            throw new GLException("Could not figure out OpenGL version");
-        int major = int.Parse(match.Groups[1].Value);
-        int minor = int.Parse(match.Groups[2].Value);
-        return (major, minor);
-    }
 
     /// <summary>
     /// Loads the LegacyGL context and the viewport
@@ -191,5 +177,15 @@ public static partial class LGL
         Keyboard.Dispose();
         instance?.Dispose();
         instance = null;
+    }
+
+    internal static (int, int) ParseGLVersion(string str)
+    {
+        Match match = GLVersionRegex().Match(str);
+        if (!match.Success)
+            throw new GLException("Could not figure out OpenGL version");
+        int major = int.Parse(match.Groups[1].Value);
+        int minor = int.Parse(match.Groups[2].Value);
+        return (major, minor);
     }
 }

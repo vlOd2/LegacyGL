@@ -25,6 +25,7 @@ using static LegacyGL.Internal.Win32Impl.Native.W32WGL;
 using static LegacyGL.Internal.Win32Impl.Native.W32Windowing;
 using static LegacyGL.Internal.Win32Impl.Native.Win32;
 using LegacyGL.Bindings;
+using System.Runtime.CompilerServices;
 
 namespace LegacyGL.Internal.Win32Impl;
 
@@ -32,7 +33,7 @@ internal unsafe class W32Viewport : IDisposable
 {
     private const string CLASS_NAME = "LegacyGLWnd";
     private const uint WINDOW_STYLES = WS_OVERLAPPEDWINDOW & ~WS_THICKFRAME & ~WS_MAXIMIZEBOX & ~WS_VISIBLE;
-    private nint hInstance;
+    private nint moduleHandle;
     private WNDCLASS wndClass;
     public nint Handle;
     private bool shownAfterInit;
@@ -41,68 +42,37 @@ internal unsafe class W32Viewport : IDisposable
     private nint wglContext;
     public readonly ConcurrentQueue<W32KBEvent> KeyboardEvents = [];
     public bool CursorHidden;
-    public float ScrollWheel;
+    public short ScrollWheel;
+    private RECT windowRect;
+    private RECT clientRect;
     #region Properties
-    public Point Position
-    {
-        get
-        {
-            RECT rect = new RECT();
-            GetWindowRect(Handle, ref rect);
-            int x = rect.left;
-            int y = rect.top;
-            return new Point(x, y);
-        }
-    }
-    public Size Size
-    {
-        get
-        {
-            RECT rect = new RECT();
-            GetWindowRect(Handle, ref rect);
-            int w = rect.right - rect.left;
-            int h = rect.bottom - rect.top;
-            return new Size(w, h);
-        }
-    }
+    private int windowStyles => GetWindowLongA(Handle, GWL_STYLE);
+    public Point Position => new(windowRect.left, windowRect.top);
+    public Size Size => new(windowRect.right - windowRect.left, windowRect.bottom - windowRect.top);
     public Size ClientSize
     {
-        get
-        {
-            RECT rect = new RECT();
-            GetClientRect(Handle, ref rect);
-            // Client rect should always be at 0,0
-            // but let's play it safe
-            int w = rect.right - rect.left;
-            int h = rect.bottom - rect.top;
-            return new Size(w, h);
-        }
+        get => new(clientRect.right, clientRect.bottom);
         set
         {
-            RECT wndRect = new RECT();
-            GetWindowRect(Handle, ref wndRect);
-
-            int x = wndRect.left;
-            int y = wndRect.top;
-
-            RECT rect = new RECT()
+            RECT rect = new()
             {
                 right = value.Width,
                 bottom = value.Height
             };
-            AdjustWindowRect(ref rect, GetWindowLongA(Handle, GWL_STYLE), false);
-
+            AdjustWindowRect(ref rect, windowStyles, false);
             int w = rect.right - rect.left;
             int h = rect.bottom - rect.top;
-            SetWindowPos(Handle, 0, x, y, w, h, SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOMOVE);
+            clientRect.right = w;
+            clientRect.bottom = h;
+            SetWindowPos(Handle, 0, 0, 0, w, h, SWP_NOZORDER | SWP_NOMOVE);
         }
     }
     public string Title
     {
         get
         {
-            StringBuilder builder = new StringBuilder(255);
-            GetWindowTextA(Handle, builder, 255);
+            StringBuilder builder = new(255);
+            _ = GetWindowTextA(Handle, builder, 255);
             return builder.ToString();
         }
         set => SetWindowTextA(Handle, value);
@@ -119,44 +89,35 @@ internal unsafe class W32Viewport : IDisposable
         get => (GetWindowLongA(Handle, GWL_STYLE) & WS_THICKFRAME) == WS_THICKFRAME;
         set
         {
-            RECT rect = new RECT();
-            GetWindowRect(Handle, ref rect);
-
-            int x = rect.left;
-            int y = rect.top;
-            int w = rect.right - rect.left;
-            int h = rect.bottom - rect.top;
-
             if (!value)
             {
                 int style = GetWindowLongA(Handle, GWL_STYLE);
                 style &= ~WS_MAXIMIZEBOX;
                 style &= ~WS_THICKFRAME;
-                SetWindowLongA(Handle, GWL_STYLE, style);
+                _ = SetWindowLongA(Handle, GWL_STYLE, style);
             }
             else
             {
                 int style = GetWindowLongA(Handle, GWL_STYLE);
                 style |= WS_MAXIMIZEBOX;
                 style |= WS_THICKFRAME;
-                SetWindowLongA(Handle, GWL_STYLE, style);
+                _ = SetWindowLongA(Handle, GWL_STYLE, style);
             }
 
-            SetWindowPos(Handle, 0, x, y, w, h, SWP_SHOWWINDOW);
+            SetWindowPos(Handle, 0, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
         }
     }
     #endregion
 
-    #region Setup functions
     public bool CreateWindow()
     {
-        hInstance = Marshal.GetHINSTANCE(typeof(W32Viewport).Module);
+        moduleHandle = Marshal.GetHINSTANCE(typeof(W32Viewport).Module);
 
         wndClass = new WNDCLASS()
         {
             style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC,
             lpfnWndProc = WndProc,
-            hInstance = hInstance,
+            hInstance = moduleHandle,
             lpszClassName = CLASS_NAME,
             hCursor = LoadCursorA(0, IDC_ARROW)
         };
@@ -171,7 +132,7 @@ internal unsafe class W32Viewport : IDisposable
         Handle = CreateWindowExA(0, CLASS_NAME, "Game", WINDOW_STYLES,
             CW_USEDEFAULT, CW_USEDEFAULT,
             LGL.DEFAULT_WIDTH, LGL.DEFAULT_HEIGHT,
-            0, 0, hInstance, 0);
+            0, 0, moduleHandle, 0);
 
         if (Handle == 0)
         {
@@ -187,6 +148,7 @@ internal unsafe class W32Viewport : IDisposable
             LGL.ErrorLogHandler("Could not create device context");
             return false;
         }
+        UpdateRects();
 
         return true;
     }
@@ -225,7 +187,7 @@ internal unsafe class W32Viewport : IDisposable
             attrib.Add(WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB);
         attrib.Add(0x00); // End of attributes
 
-        nint context = createContextARB(deviceContext, 0, [..attrib]);
+        nint context = createContextARB(deviceContext, 0, [.. attrib]);
         if (context == 0)
         {
             LGL.ErrorLogHandler("Could not create context");
@@ -312,19 +274,24 @@ internal unsafe class W32Viewport : IDisposable
 
         return true;
     }
-    #endregion
+
+    private void UpdateRects()
+    {
+        windowRect = new();
+        clientRect = new();
+        GetWindowRect(Handle, ref windowRect);
+        GetClientRect(Handle, ref clientRect);
+    }
 
     public void Center()
     {
-        RECT rect = new();
-        GetWindowRect(Handle, ref rect);
         int sw = GetSystemMetrics(W32ConstSM.SM_CXSCREEN);
         int sh = GetSystemMetrics(W32ConstSM.SM_CYSCREEN);
-        int w = rect.right - rect.left;
-        int h = rect.bottom - rect.top;
+        int w = windowRect.right - windowRect.left;
+        int h = windowRect.bottom - windowRect.top;
         int x = sw / 2 - w / 2;
         int y = sh / 2 - h / 2;
-        SetWindowPos(Handle, 0, x, y, w, h, SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOSIZE);
+        SetWindowPos(Handle, 0, x, y, w, h, SWP_NOZORDER | SWP_NOSIZE);
     }
 
     public void Poll()
@@ -372,18 +339,20 @@ internal unsafe class W32Viewport : IDisposable
 
             case WM_KEYDOWN:
                 {
-                    short vk = (short)(int)wParam;
-                    byte sc = (byte)(((int)lParam >> 16) & 0xFF);
-                    bool repeat = ((int)lParam & (1 << 30)) > 0;
+                    short vk = (short)(long)wParam;
+                    int keyInfo = (int)(long)lParam;
+                    byte sc = (byte)((keyInfo >> 16) & 0xFF);
+                    bool repeat = (keyInfo & (1 << 30)) > 0;
                     PutKBEvent(true, vk, sc, repeat);
                     break;
                 }
 
             case WM_KEYUP:
                 {
-                    short vk = (short)(int)wParam;
-                    byte sc = (byte)(((int)lParam >> 16) & 0xFF);
-                    bool repeat = ((int)lParam & (1 << 30)) > 0;
+                    short vk = (short)(long)wParam;
+                    int keyInfo = (int)(long)lParam;
+                    byte sc = (byte)((keyInfo >> 16) & 0xFF);
+                    bool repeat = (keyInfo & (1 << 30)) > 0;
                     PutKBEvent(false, vk, sc, repeat);
                     break;
                 }
@@ -405,8 +374,33 @@ internal unsafe class W32Viewport : IDisposable
                 break;
 
             case WM_MOUSEWHEEL:
-                ScrollWheel = (short)(((int)wParam >> 16) & 0xFFFF);
+                ScrollWheel = HIWORD(wParam);
                 break;
+
+            case WM_WINDOWPOSCHANGED:
+                {
+                    WINDOWPOS* ptr = (WINDOWPOS*)lParam;
+
+                    bool isMove = (ptr->flags & SWP_NOMOVE) == 0;
+                    bool isResize = (ptr->flags & SWP_NOSIZE) == 0;
+                    if (!isMove && !isResize)
+                        break;
+
+                    if (isMove)
+                    {
+                        windowRect.left = ptr->x;
+                        windowRect.top = ptr->y;
+                    }
+
+                    if (isResize)
+                    {
+                        windowRect.right = ptr->w + ptr->x;
+                        windowRect.bottom = ptr->h + ptr->y;
+                        GetClientRect(Handle, ref clientRect);
+                    }
+
+                    break;
+                }
 
             default:
                 return DefWindowProcA(hWnd, uMsg, wParam, lParam);
@@ -426,7 +420,7 @@ internal unsafe class W32Viewport : IDisposable
         if (Handle != 0)
         {
             DestroyWindow(Handle);
-            UnregisterClassA(CLASS_NAME, hInstance);
+            UnregisterClassA(CLASS_NAME, moduleHandle);
         }
         GLLoader.Unload();
 
@@ -437,6 +431,6 @@ internal unsafe class W32Viewport : IDisposable
         wglContext = 0;
         deviceContext = 0;
         Handle = 0;
-        hInstance = 0;
+        moduleHandle = 0;
     }
 }

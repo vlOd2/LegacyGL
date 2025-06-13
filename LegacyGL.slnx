@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="ExampleGame/ExampleGame.csproj" />
+  <Project Path="LegacyGL/LegacyGL.csproj" />
+  <Project Path="XLibSharp/XLibSharp.csproj" />
+</Solution>

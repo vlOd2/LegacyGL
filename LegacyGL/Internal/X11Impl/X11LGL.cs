@@ -2,6 +2,7 @@
 // Licensed under the GNU Affero General Public License, version 3.0
 
 using LegacyGL.Internal.Abstract;
+using System.Drawing;
 using ZeroCraft.LegacyGL.Internal.X11Impl;
 
 namespace LegacyGL.Internal.X11Impl;
@@ -13,20 +14,21 @@ internal class X11LGL : ILGL
     private X11Keyboard keyboard;
     private X11Mouse mouse;
     #region Properties
-    public int VWidth
+    public Size Size
     {
-        get => viewport.Width;
-        set => viewport.Width = value;
+        get => new(viewport.Width, viewport.Height);
+        set
+        {
+            viewport.Width = value.Width;
+            viewport.Height = value.Height;
+        }
     }
-    public int VHeight
-    {
-        get => viewport.Height;
-        set => viewport.Height = value;
-    }
-    public string VTitle { get => viewport.Title; set => viewport.Title = value; }
-    public nint VIcon { get; set; }
-    public bool VResizable { get => viewport.Resizable; set => viewport.Resizable = value; }
+    public string Title { get => viewport.Title; set => viewport.Title = value; }
+    public nint Icon { get; set; }
+    public bool Resizable { get => viewport.Resizable; set => viewport.Resizable = value; }
     public bool ShouldClose => viewport.ShouldClose;
+    // TODO: X11 FOCUSED
+    public bool Focused => true;
     public string ClipboardContent { get => ""; set { } }
     public IKeyboard Keyboard => keyboard;
     public IMouse Mouse => mouse;

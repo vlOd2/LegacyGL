@@ -53,7 +53,7 @@ internal class W32Mouse : IMouse
         this.viewport = viewport;
     }
 
-    private void PollPosition(Point pos)
+    private void PollPosition(POINT pos)
     {
         if (!Captured)
             ScreenToClient(viewport.Handle, ref pos);
@@ -61,8 +61,8 @@ internal class W32Mouse : IMouse
         if (pos == lastPos)
             return;
 
-        int mx = pos.X;
-        int my = pos.Y;
+        int mx = pos.x;
+        int my = pos.y;
         int dx = mx - lastPos.X;
         int dy = my - lastPos.Y;
         delta.X += dx;
@@ -123,11 +123,11 @@ internal class W32Mouse : IMouse
         RECT wndRect = new();
         GetWindowRect(viewport.Handle, ref wndRect);
 
-        Point curPos = new();
+        POINT curPos = new();
         GetCursorPos(ref curPos);
 
-        if (curPos.X < wndRect.left || curPos.Y < wndRect.top ||
-            curPos.X > wndRect.right || curPos.Y > wndRect.bottom)
+        if (curPos.x < wndRect.left || curPos.y < wndRect.top ||
+            curPos.x > wndRect.right || curPos.y > wndRect.bottom)
             return;
 
         PollPosition(curPos);
