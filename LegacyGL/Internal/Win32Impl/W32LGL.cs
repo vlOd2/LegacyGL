@@ -70,7 +70,7 @@ internal unsafe class W32LGL : ILGL
             glLib = W32Libraries.LoadLibraryA(GL_LIBRARY);
             if (glLib == 0)
                 throw new GLException($"Could not load OpenGL: LoadLibraryA failed ({GL_LIBRARY})");
-            apiLoader = new W32NativeAPILoader(glLib, alLib);
+            apiLoader = new W32NativeAPILoader(glLib);
 
             viewport = new W32Viewport();
             if (!viewport.CreateWindow())
@@ -107,6 +107,7 @@ internal unsafe class W32LGL : ILGL
             LGL.ErrorLogHandler($"Could not load OpenAL: LoadLibraryA failed ({AL_LIBRARY})");
             return;
         }
+        apiLoader.ALLib = alLib;
         try
         {
             ALLoader.Load(apiLoader);

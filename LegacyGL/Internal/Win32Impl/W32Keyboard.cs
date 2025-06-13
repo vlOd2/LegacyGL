@@ -59,7 +59,7 @@ internal class W32Keyboard : IKeyboard
             char c = TranslateVK(vk, sc, kbState);
             EnqueueKeyEvent(vk, c, state, repeat);
 
-            Console.WriteLine($"{(state ? "Pressed" : "Released")} {c} (0x{vk:X2}) {repeat}");
+            //Console.WriteLine($"{(state ? "Pressed" : "Released")} {c} (0x{vk:X2}) {repeat}");
         }
     }
 

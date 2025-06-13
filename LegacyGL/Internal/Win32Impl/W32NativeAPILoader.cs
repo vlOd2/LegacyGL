@@ -10,13 +10,12 @@ namespace LegacyGL.Internal.Win32Impl;
 
 internal class W32NativeAPILoader : INativeAPILoader
 {
-    private nint glLib;
-    private nint alLib;
+    public nint GLLib;
+    public nint ALLib;
 
-    public W32NativeAPILoader(nint glLib, nint alLib)
+    public W32NativeAPILoader(nint glLib)
     {
-        this.glLib = glLib;
-        this.alLib = alLib;
+        GLLib = glLib;
     }
 
     public nint LoadGL(string name)
@@ -24,7 +23,7 @@ internal class W32NativeAPILoader : INativeAPILoader
         nint ptr = W32WGL.wglGetProcAddress(name);
         // GL1.0/1.1 functions have to be loaded from the GL library directly, retarded, I know
         if (ptr == nint.Zero)
-            ptr = W32Libraries.GetProcAddress(glLib, name);
+            ptr = W32Libraries.GetProcAddress(GLLib, name);
         return ptr;
     }
 
@@ -36,5 +35,5 @@ internal class W32NativeAPILoader : INativeAPILoader
         return Marshal.GetDelegateForFunctionPointer<T>(ptr);
     }
 
-    public nint LoadAL(string name) => W32Libraries.GetProcAddress(alLib, name);
+    public nint LoadAL(string name) => W32Libraries.GetProcAddress(ALLib, name);
 }
